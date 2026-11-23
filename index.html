@@ -67,12 +67,13 @@ main{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(340px,1fr);height
 .al.warn{background:var(--warn);color:#2a1600}.al.bad{background:var(--bad);color:#fff}.al.sus{background:var(--sus);color:#fff}.al.info{background:rgba(15,18,20,.78);color:#fff}
 .vpbtns{position:absolute;right:12px;top:12px;display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;max-width:34%}
 .vpbtns .btn{background:rgba(15,18,20,.78);color:#fff;border-color:rgba(255,255,255,.25)}.vpbtns .btn.on{background:var(--acc);color:var(--acc-ink);border-color:var(--acc)}
-.camnote{position:absolute;left:50%;bottom:72px;transform:translateX(-50%);width:min(92%,520px);padding:10px 14px;border-radius:10px;background:rgba(15,18,20,.85);color:#fff;font-size:14px;display:none}
+.camnote{position:absolute;left:50%;bottom:140px;transform:translateX(-50%);width:min(92%,520px);padding:10px 14px;border-radius:10px;background:rgba(15,18,20,.85);color:#fff;font-size:14px;display:none}
 .camnote.show{display:block}
 .cursor{position:absolute;width:46px;height:46px;margin:-23px 0 0 -23px;border-radius:50%;border:3px solid #fff;pointer-events:none;display:none;--p:0;background:conic-gradient(var(--acc) calc(var(--p)*1turn),transparent 0) border-box;-webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 9px),#000 calc(100% - 8px));mask:radial-gradient(farthest-side,transparent calc(100% - 9px),#000 calc(100% - 8px))}
-.toast{position:absolute;left:50%;bottom:72px;transform:translateX(-50%);max-width:90%;padding:10px 16px;border-radius:10px;background:#fff;color:#151a1d;font-weight:500;box-shadow:0 6px 20px rgba(0,0,0,.25);opacity:0;transition:opacity .2s;pointer-events:none}
+.toast{position:absolute;left:50%;bottom:calc(100% + 10px);transform:translateX(-50%);max-width:90%;padding:10px 16px;border-radius:10px;background:#fff;color:#151a1d;font-weight:500;box-shadow:0 6px 20px rgba(0,0,0,.25);opacity:0;transition:opacity .2s;pointer-events:none}
 .toast.show{opacity:1}.toast.bad{background:var(--bad);color:#fff}.toast.warn{background:var(--warn);color:#2a1600}.toast.ok{background:var(--ok);color:#06231a}.toast.sus{background:var(--sus);color:#fff}
-.legend{position:absolute;left:0;right:0;bottom:0;display:flex;gap:6px;flex-wrap:wrap;padding:8px 12px;background:rgba(15,18,20,.72);color:#e9ece8;font-size:13px}
+.bottom{position:absolute;left:0;right:0;bottom:0}
+.legend{display:flex;gap:6px;flex-wrap:wrap;padding:8px 12px;background:rgba(15,18,20,.72);color:#e9ece8;font-size:13px}
 .legend span{white-space:nowrap;padding:2px 8px;border-radius:6px;background:rgba(255,255,255,.08)}.legend b{font-weight:600;color:var(--acc)}
 .rail{overflow-y:auto;border-left:1px solid var(--line);padding:14px;display:grid;gap:12px;align-content:start}
 .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px}
@@ -122,14 +123,27 @@ label.ck{display:flex;gap:10px;align-items:flex-start;min-height:40px;padding:4p
 .scroll{overflow-x:auto}table.dl{width:100%;border-collapse:collapse;font-size:13px}table.dl th,table.dl td{padding:5px 6px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap}table.dl th{color:var(--mute);font-weight:600}table.dl .num{text-align:right;font-variant-numeric:tabular-nums}
 .log{margin:0;padding:0;list-style:none;font-size:13px;max-height:220px;overflow:auto}.log li{padding:4px 0;border-bottom:1px solid var(--line)}.log time{color:var(--mute);font-variant-numeric:tabular-nums;margin-right:6px}
 details summary{cursor:pointer;font-weight:600;min-height:32px}details p,details li{font-size:14px}details code{font-size:13px;overflow-wrap:anywhere}
+.manualbar{display:flex;gap:10px;align-items:center;padding:8px 12px;background:rgba(15,18,20,.88);color:#fff;font-size:14px;border-top:1px solid rgba(255,255,255,.12)}
+.manualbar b{color:var(--acc);font-weight:600}.manualbar .btn{min-height:36px;padding:0 12px;font-size:14px;background:transparent;color:#fff;border-color:rgba(255,255,255,.4);margin-left:auto;flex:none}
+.manualPanel{position:absolute;right:12px;top:64px;bottom:150px;width:min(48%,380px);overflow:auto;background:rgba(15,18,20,.92);color:#fff;border-radius:12px;padding:12px 14px;font-size:14px;line-height:1.4}
+.manualPanel ol{margin:8px 0;padding-left:20px}.manualPanel li{margin:7px 0}.manualPanel li.done{opacity:.6}.manualPanel li.cur b{color:var(--acc)}
+.manualPanel table{width:100%;border-collapse:collapse;font-size:13px;margin-top:6px}.manualPanel td{padding:4px 0;border-top:1px solid rgba(255,255,255,.15);vertical-align:top}.manualPanel td:first-child{color:#b8c0c4;padding-right:10px;white-space:nowrap}
+.tt{display:inline-flex;gap:8px;align-items:center;font-weight:600;flex-wrap:wrap}
+.pt{font:600 11px Barlow,sans-serif;font-style:normal;padding:1px 7px;border-radius:999px;border:1px solid;white-space:nowrap;line-height:1.5}
+.pt.a{color:light-dark(#1f6fc4,#7cbcff);border-color:#4aa3ff}.pt.e{color:light-dark(#566210,#cfdc55);border-color:#a9b72a}.pt.s{color:light-dark(#a85400,#f5a04b);border-color:#ef8d24}
+.stephead{margin:10px 2px -2px;font-size:15px;font-weight:600;color:var(--mute);scroll-margin-top:10px}
+.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(132px,1fr));gap:6px}
+.stepbtn{text-align:left;border:2px solid var(--line);border-radius:10px;background:var(--tint);padding:7px 9px;cursor:pointer;min-height:44px;display:grid;gap:3px;align-content:start}
+.stepbtn.cur{border-color:var(--sel)}.stepbtn.ok{border-color:var(--ok)}.stepbtn b{font:600 15px "Barlow Semi Condensed",sans-serif}.stepbtn small{font-size:12px;color:var(--mute)}.stepbtn span{display:flex;gap:4px;flex-wrap:wrap}
+.stepbtn:focus-visible{outline:3px solid var(--sel);outline-offset:2px}
 .hidden{display:none!important}
 @media (max-width:900px){main{display:block;height:auto}.vp{aspect-ratio:10/8;max-height:72vh;width:100%}.rail{border-left:0;overflow:visible}}
-@media (max-width:600px){.vp{aspect-ratio:4/5}.vp svg.ov{top:64px;bottom:110px;height:auto}.legend{font-size:12px;padding:6px 8px}.tl{left:8px;top:8px;max-width:calc(100% - 140px)}.hud{font-size:13px;padding:6px 10px}.vpbtns{right:8px;top:8px;max-width:130px}.vpbtns .btn{min-height:38px;padding:0 10px;font-size:14px}.camnote,.toast{bottom:118px}.tiles{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:600px){.vp{aspect-ratio:4/5}.vp svg.ov{top:64px;bottom:140px;height:auto}.legend{font-size:12px;padding:6px 8px}.tl{left:8px;top:8px;max-width:calc(100% - 140px)}.hud{font-size:13px;padding:6px 10px}.vpbtns{right:8px;top:8px;max-width:130px}.vpbtns .btn{min-height:38px;padding:0 10px;font-size:14px}.camnote{bottom:150px}.manualPanel{left:8px;right:8px;width:auto;top:56px;bottom:150px}.manualbar{font-size:13px}.tiles{grid-template-columns:repeat(2,minmax(0,1fr))}}
 </style>
 </head>
 <body>
 <header class="top" id="top">
-  <h1 class="brand">TorqueTrace <small>prototype v2</small></h1>
+  <h1 class="brand">TorqueTrace <small>prototype v3</small></h1>
   <div class="task"><b>Refit access panel 571AB</b> · 9V-ZZC · 12 self-locking anchor nuts · 25.0 N·m ± 1.0 plus running torque · critical task (demo)</div>
   <div class="chips" id="chips"></div>
 </header>
@@ -146,33 +160,39 @@ details summary{cursor:pointer;font-weight:600;min-height:32px}details p,details
       <button class="btn" id="twinBtn" aria-pressed="false">Twin view</button>
     </div>
     <div class="camnote" id="camnote"></div>
-    <div class="toast" id="toast" role="status" aria-live="polite"></div>
-    <div class="legend" aria-label="Gesture guide">
-      <span><b>Open palm, hold</b> gestures on/off</span><span><b>Point</b> select bolt</span><span><b>Two hands, fingers up</b> jump to that bolt</span><span><b>Swipe</b> next/prev</span><span><b>Fist, hold</b> photo</span><span><b>OK sign, hold</b> inspector confirms</span><span><b>Thumbs up, hold</b> finish</span>
-    </div>
+    <div class="manualPanel hidden" id="manualPanel" aria-label="AR task card manual"></div>
+    <div class="bottom"><div class="toast" id="toast" role="status" aria-live="polite"></div>
+      <div class="manualbar" id="manualbar"></div>
+      <div class="legend" aria-label="Gesture guide"><span><b>Open palm, hold</b> gestures on/off</span><span><b>Point</b> select bolt</span><span><b>Swipe</b> next/prev</span><span><b>Victory, hold</b> manual</span><span><b>OK sign, hold</b> confirm</span><span><b>Thumbs up, hold</b> finish</span></div></div>
   </section>
   <aside class="rail">
+    <nav class="card" id="flow" aria-label="Task steps"></nav>
+    <h2 class="stephead" id="step-prepare">Step 1 · Prepare</h2>
     <section class="card" id="woCard"></section>
     <section class="card tools" id="toolCard"></section>
     <section class="card alert hidden" id="impactCard"></section>
+    <h2 class="stephead" id="step-torque">Step 2 · Torque with AR</h2>
     <section class="card" id="boltCard"></section>
-    <section class="card"><h2>All bolts <span id="blSum"></span></h2><div class="bl" id="bl"></div></section>
-    <section class="card" id="liveCard"><h2>Live data <span id="liveSub">simulated sensors</span></h2>
+    <section class="card"><h2><b class="tt">All bolts<em class="pt a">Accuracy</em></b><span id="blSum"></span></h2><div class="bl" id="bl"></div></section>
+    <section class="card" id="liveCard"><h2><b class="tt">Live data<em class="pt a">Accuracy</em><em class="pt s">Safety</em></b><span id="liveSub">simulated sensors</span></h2>
       <div class="fig" id="curveFig"><canvas id="curve" aria-label="Torque against time for the latest pull"></canvas></div>
       <div class="tiles" id="tiles"></div>
       <div class="sub"><h3>Work area heat <span class="pill" id="heatPill"></span></h3><p class="small" id="heatText" style="margin:0 0 8px"></p>
         <div class="seg" role="group" aria-label="Simulated WBGT"><button data-wbgt="29.6">29.6 °C</button><button data-wbgt="31.4">31.4 °C</button><button data-wbgt="32.4">32.4 °C</button><button data-wbgt="33.5">33.5 °C</button></div>
         <p class="small">WBGT bands from MOM's heat stress framework for outdoor work, such as line maintenance on the apron. Demo sensor values.</p></div></section>
-    <section class="card" id="twinCard"></section>
+    <h2 class="stephead" id="step-verify">Step 3 · Verify</h2>
     <section class="card" id="finishCard"></section>
-    <section class="card"><h2>Data log <span id="dataSum"></span></h2>
+    <h2 class="stephead" id="step-handover">Step 4 · Hand over</h2>
+    <section class="card"><h2><b class="tt">Handover summary<em class="pt e">Efficiency</em></b><span>template; AI version in stage 4</span></h2>
+      <div class="row"><button class="btn" id="hoBtn">Generate</button><button class="btn" id="copyBtn" disabled>Copy</button></div>
+      <textarea id="hoText" class="hidden" readonly aria-label="Handover summary"></textarea></section>
+    <section class="card"><h2><b class="tt">Data log<em class="pt e">Efficiency</em></b><span id="dataSum"></span></h2>
       <div class="scroll"><table class="dl"><thead><tr><th>Time</th><th>Bolt</th><th class="num">Applied</th><th class="num">Target</th><th class="num">Running</th><th>Tool</th><th>Result</th></tr></thead><tbody id="dataBody"></tbody></table></div>
       <ul class="jobs" id="partsList"></ul>
       <div class="row" style="margin-top:8px"><button class="btn" id="csvDl">Download CSV</button><button class="btn" id="csvCopy">Copy CSV</button></div></section>
-    <section class="card"><h2>Handover summary <span>template; AI version in stage 4</span></h2>
-      <div class="row"><button class="btn" id="hoBtn">Generate</button><button class="btn" id="copyBtn" disabled>Copy</button></div>
-      <textarea id="hoText" class="hidden" readonly aria-label="Handover summary"></textarea></section>
-    <section class="card"><h2>Evidence photos <span id="phSum">none yet</span></h2>
+    <h2 class="stephead">Supporting data</h2>
+    <section class="card" id="twinCard"></section>
+    <section class="card"><h2><b class="tt">Evidence photos<em class="pt s">Safety</em></b><span id="phSum">none yet</span></h2>
       <div class="photos" id="photos"></div>
       <div class="row" style="margin-top:8px"><button class="btn" id="photoBtn">Add photo</button></div></section>
     <section class="card"><h2>Event log</h2><ul class="log" id="log"></ul></section>
@@ -188,7 +208,7 @@ details summary{cursor:pointer;font-weight:600;min-height:32px}details p,details
       <details><summary>ESP32 wrench (stage 5)</summary>
         <p>Advertise as <code>TT-TW0042</code> with the Nordic UART service <code>6e400001-b5a3-f393-e0a9-e50e24dcca9e</code>. Send lines on the TX characteristic: <code>LV:12.4</code> live torque samples, <code>RT:2.6</code> running torque, <code>TQ:27.8</code> peak torque at the wrench drive, <code>BT:84</code> battery %, <code>EV:DROP</code> and <code>EV:OVER</code> from the motion sensor, and <code>ID:TW-0042</code> when asked with <code>ID?</code>. With a crowfoot fitted in line, the app converts the drive reading to torque at the fastener.</p></details>
       <details><summary>Keyboard shortcuts</summary>
-        <p>T or Space: simulated pull · N / B: next / previous bolt · G: gestures on/off · P: photo · F: finish · O: inspector confirms bolt</p></details>
+        <p>T or Space: simulated pull · N / B: next / previous bolt · G: gestures on/off · M: manual · P: photo · F: finish · O: inspector confirms bolt</p><p>Extra gestures: fist, hold = evidence photo · two hands with fingers up = jump to that bolt number.</p></details>
       <div class="row" style="margin-top:10px"><button class="btn" id="resetBtn">Reset task</button></div>
     </section>
   </aside>
@@ -238,7 +258,7 @@ const MP = 'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@1.1.1';
 const MODEL = 'https://storage.googleapis.com/mediapipe-models/gesture_recognizer/gesture_recognizer/float16/1/gesture_recognizer.task';
 const NUS = '6e400001-b5a3-f393-e0a9-e50e24dcca9e', NUS_RX = '6e400002-b5a3-f393-e0a9-e50e24dcca9e', NUS_TX = '6e400003-b5a3-f393-e0a9-e50e24dcca9e';
 const KEY = 'torquetrace-proto-v2';
-const HOLD = {Open_Palm:1000, Closed_Fist:900, Thumb_Up:900, OK:900};
+const HOLD = {Open_Palm:1000, Closed_Fist:900, Thumb_Up:900, OK:900, Victory:900};
 const LABEL = {Open_Palm:'Open palm', Closed_Fist:'Fist', Thumb_Up:'Thumbs up', OK:'OK sign', Point:'Pointing', None:'Hand seen', Victory:'Victory', Thumb_Down:'Thumbs down', Pointing_Up:'Pointing up', ILoveYou:'Hand sign'};
 const STAT = {open:['p-open','Not torqued'], ok:['p-ok','In spec'], bad:['p-bad','Out of tolerance'], seq:['p-seq','Out of sequence'], sus:['p-sus','Suspect: tool failed'], rej:['p-rej','Rejected at inspection']};
 const REJECT = ['Torque stripe missing or broken', 'Fastener or nut damaged', 'Wrong part fitted', 'Other: see notes'];
@@ -247,7 +267,7 @@ const FRAMED = window.self !== window.top;
 const fresh = () => ({bolts:POS.map((p, i) => ({n:i+1, status:'open', kind:null, reading:null, run:null, target:null, tool:null, t:null, note:'', stripe:null, nutNew:null, history:[]})),
   active:1, tool:null, toolState:'none', adapter:null, angle:'inline', mode:'sim', outcome:'in', gestures:false, photos:[], log:[],
   finish:null, out:{}, areaClear:false, signed:null, tech:'T-1234', insp:null, impact:null, tools:{}, stripeColor:'orange',
-  safety:{safe:false, tags:false, ppe:false}, lockOrder:true, twin:false, wbgt:29.6, tele:{batt:86, rssi:-58, temp:31.2}, parts:[], curve:null});
+  safety:{safe:false, tags:false, ppe:false}, lockOrder:true, twin:false, manual:false, handed:false, wbgt:29.6, tele:{batt:86, rssi:-58, temp:31.2}, parts:[], curve:null});
 let S = fresh();
 try { const saved = JSON.parse(localStorage.getItem(KEY)); if (saved && saved.bolts && saved.bolts.length === 12) { S = Object.assign(fresh(), saved); if (S.toolState !== 'none') S.toolState = S.tool ? 'checked' : 'none'; S.gestures = false; if (S.insp) S.insp.msg = ''; } } catch (e) {}
 const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} };
@@ -267,6 +287,16 @@ const TS = id => S.tools[id] || (S.tools[id] = {cycles:TOOLS[id].cycles || 0, dr
 const phase = () => S.insp && S.insp.signed ? 'closed' : S.insp && S.insp.active ? 'inspect' : S.signed ? 'await' : 'work';
 const locked = () => phase() !== 'work';
 const safetyDone = () => SAFETY.every(([k]) => S.safety[k]);
+const PT = (...k) => k.map(x => `<em class="pt ${x[0].toLowerCase()}">${x}</em>`).join('');
+const H = (title, tags, sub) => `<h2><b class="tt">${title}${PT(...tags)}</b>${sub != null ? `<span>${sub}</span>` : ''}</h2>`;
+const MANUAL = [
+  {k:'safe', t:'Make the aircraft safe', d:'Tick the pre-task safety check: systems depressurised or isolated, warning tags placed, PPE on.'},
+  {k:'tool', t:'Get a serviceable wrench', d:'Scan the wrench sticker. It must be in calibration, under its cycle limit and cover the torque range.'},
+  {k:'fit', t:'Fit the panel', d:'Position panel 571AB and start all 12 self-locking nuts by hand.'},
+  {k:'torque', t:'Torque in numbered order', d:'25.0 N·m plus the running torque measured on each nut, ± 1.0. Running torque under 1.0 N·m means a worn nut: replace it.'},
+  {k:'stripe', t:'Apply torque stripe', d:'Paint a stripe across each nut and the panel, then photograph it for the record.'},
+  {k:'close', t:'Close out and sign', d:'Return every tool to the store, clear the area, sign with your staff badge.'},
+  {k:'inspect', t:'Independent inspection', d:'A second qualified person confirms assembly, locking and sense of operation, then signs.'}];
 const today0 = () => { const d = new Date(); d.setHours(0, 0, 0, 0); return d; };
 
 function log(text){ S.log.unshift({t:Date.now(), text}); S.log = S.log.slice(0, 80); }
@@ -355,14 +385,42 @@ function render(){
     g.querySelector('.td').textContent = b.reading != null ? `prev ${f1(prev)}` : fmtDate(last.date);
   });
   $('alerts').innerHTML = alerts().slice(0, 4).map(([k, t]) => `<div class="al ${k}">${esc(t)}</div>`).join('');
-  renderWO(); renderTool(); renderImpact(); renderBolt(); renderList(done); renderTwin(); renderFinish(); renderData(); renderPhotos(); updateLive();
+  renderFlow(); renderManual(); renderWO(); renderTool(); renderImpact(); renderBolt(); renderList(done); renderTwin(); renderFinish(); renderData(); renderPhotos(); updateLive();
   $('log').innerHTML = S.log.slice(0, 40).map(l => `<li><time>${hhmm(l.t)}</time>${esc(l.text)}</li>`).join('') || '<li class="small">Nothing yet.</li>';
   hud(); save();
 }
 
+function renderFlow(){
+  const done = S.bolts.filter(b => b.status === 'ok').length, ph = phase(), closed = ph === 'closed';
+  const st = [
+    {id:'prepare', n:'Prepare', sub:'Safety check · tool pairing', tags:['Safety', 'Accuracy'], ok:safetyDone() && (S.toolState === 'connected' || S.bolts.some(b => b.history.length))},
+    {id:'torque', n:'Torque with AR', sub:`${done} of 12 recorded`, tags:['Accuracy'], ok:done === 12},
+    {id:'verify', n:'Verify', sub:closed ? 'Signed and inspected' : ph === 'work' ? 'Close-out · inspection' : 'Inspection pending', tags:['Safety'], ok:closed},
+    {id:'handover', n:'Hand over', sub:'Summary · data log', tags:['Efficiency'], ok:closed && S.handed}];
+  const cur = st.findIndex(x => !x.ok);
+  $('flow').innerHTML = `<p class="small" style="margin:0 0 8px">Scan the tool → AR guides each bolt → the wrench records it → verified handover</p><div class="steps">${st.map((x, i) => `<button class="stepbtn ${x.ok ? 'ok' : ''} ${i === cur ? 'cur' : ''}" data-go="${x.id}"><b>${x.ok ? '✓' : i + 1} ${x.n}</b><small>${x.sub}</small><span>${PT(...x.tags)}</span></button>`).join('')}</div>`;
+  $('flow').querySelectorAll('[data-go]').forEach(b => b.onclick = () => $('step-' + b.dataset.go).scrollIntoView({behavior:'smooth', block:'start'}));
+}
+function manualState(){
+  const any = S.bolts.some(b => b.history.length), allOk = S.bolts.every(b => b.status === 'ok'), signed = !!S.signed || phase() === 'closed';
+  const done = {safe:safetyDone(), tool:S.toolState === 'connected' || any, fit:any, torque:allOk, stripe:S.bolts.every(b => b.stripe && b.stripe.ok) || signed, close:signed, inspect:phase() === 'closed'};
+  return {done, cur:MANUAL.findIndex(m => !done[m.k])};
+}
+function renderManual(){
+  const {done, cur} = manualState(), nx = nextExpected();
+  const hint = {safe:'tick the safety check in the work order', tool:'scan and connect a serviceable wrench', fit:'fit the panel, start all nuts by hand, then torque bolt 1', torque:nx ? `bolt ${nx} next · ${TGT} ${U} + running torque` : 'all bolts in spec', stripe:'apply and photograph the torque stripes', close:'return tools, clear the area, sign', inspect:'a second person confirms each bolt'};
+  $('manualbar').innerHTML = cur < 0 ? `<span><b>Task card complete</b> · all ${MANUAL.length} steps done</span><button class="btn" id="manBtn" aria-expanded="${S.manual}">${S.manual ? 'Close manual' : 'Manual'}</button>`
+    : `<span><b>Step ${cur + 1} of ${MANUAL.length} · ${MANUAL[cur].t}</b> · ${esc(hint[MANUAL[cur].k])}</span><button class="btn" id="manBtn" aria-expanded="${S.manual}">${S.manual ? 'Close manual' : 'Manual'}</button>`;
+  $('manBtn').onclick = toggleManual;
+  $('manualPanel').classList.toggle('hidden', !S.manual);
+  if (S.manual) $('manualPanel').innerHTML = `<b>Task card · ${TASK.title}</b><div style="color:#b8c0c4;font-size:13px">AR manual · ${WO.no} · demo data</div>
+    <ol>${MANUAL.map((x, i) => `<li class="${done[x.k] ? 'done' : ''} ${i === cur ? 'cur' : ''}"><b>${done[x.k] ? '✓ ' : ''}${x.t}</b><br>${esc(x.d)}</li>`).join('')}</ol>
+    <table><tr><td>Torque</td><td>${TGT} ${U} + running torque, ± ${TOL}</td></tr><tr><td>Min running</td><td>${f1(TASK.minRun)} ${U}, else replace the nut</td></tr><tr><td>Order</td><td>Bolts 1 to 12 as numbered on the panel</td></tr><tr><td>Hazards</td><td>${TASK.hazards.map(h => esc(h.title)).join('; ')}</td></tr><tr><td>Critical task</td><td>Independent inspection required</td></tr></table>`;
+}
+function toggleManual(){ S.manual = !S.manual; log(`Manual ${S.manual ? 'opened' : 'closed'}`); render(); }
 function renderWO(){
   const c = $('woCard'), sd = safetyDone(), lk = locked(), rem = reminders();
-  c.innerHTML = `<h2>Work order <span>${WO.no} (demo)</span></h2>
+  c.innerHTML = `${H('Work order', ['Safety'], WO.no + ' (demo)')}
     <ul class="facts"><li>${TASK.title} · ${TASK.ac} · planned ${fmtDate(WO.date)}</li><li>Needs a torque wrench covering ${f1(TASK.target - TASK.tol)}–${f1(TASK.target + TASK.tol + 5)} ${U}, 12 self-locking anchor nuts, a crowfoot if access needs it</li></ul>
     <h3>Pre-task safety check ${sd ? '<span class="pill p-ok">Done</span>' : '<span class="pill p-seq">Tools locked until done</span>'}</h3>
     ${SAFETY.map(([k, l]) => `<label class="ck"><input type="checkbox" data-sf="${k}" ${S.safety[k] ? 'checked' : ''} ${lk ? 'disabled' : ''}> ${esc(l)}</label>`).join('')}
@@ -376,7 +434,7 @@ function renderWO(){
 
 function renderTool(){
   const c = $('toolCard'), id = S.tool;
-  let h = `<h2>Tools <span>${S.toolState === 'connected' ? (S.mode === 'ble' ? 'Bluetooth wrench' : 'simulated wrench') : 'scan the sticker on each tool'}</span></h2>`;
+  let h = H('Tools', ['Accuracy', 'Safety'], S.toolState === 'connected' ? (S.mode === 'ble' ? 'Bluetooth wrench' : 'simulated wrench') : 'scan the sticker on each tool');
   if (!id) {
     h += `<p class="muted" style="margin:0 0 10px">Scan the QR sticker on the torque wrench (text like <code>TT:TW-0042</code>) with the camera or from a photo.</p>
       <div class="row"><button class="btn pri" id="scanCamBtn">Scan with camera</button><button class="btn" id="scanPhotoBtn">Scan from photo</button></div>
@@ -431,7 +489,7 @@ function renderImpact(){
   if (!m) { c.classList.add('hidden'); return; }
   c.classList.remove('hidden');
   const total = m.jobs.reduce((a, j) => a + j.bolts, 0);
-  c.innerHTML = `<h2>Reverse traceability <span>${m.tool} failed its check</span></h2>
+  c.innerHTML = `${H('Reverse traceability', ['Safety', 'Efficiency'], m.tool + ' failed its check')}
     <p class="msg sus" style="margin-top:0">${m.tool} was out of tolerance when checked. Everything it torqued since its last good calibration (${fmtDate(m.since)}) is suspect: <b>${m.jobs.length} earlier jobs, ${total} bolts</b>${m.bolts.length ? `, plus <b>bolts ${listNums(m.bolts)}</b> on this panel` : ''}.</p>
     <ul class="jobs">${m.jobs.map(j => `<li>${fmtDate(j.date)} · ${j.ac} · ${esc(j.task)} · ${j.bolts} bolts · ${j.tech}</li>`).join('')}${m.bolts.length ? `<li><b>Today · ${TASK.ac} · ${TASK.title} · bolts ${listNums(m.bolts)}: re-torque with a serviceable wrench</b></li>` : ''}</ul>
     <div class="row" style="margin-top:10px"><button class="btn" id="impCopy">Copy list</button><button class="btn" id="impHide">Dismiss</button></div><p class="small">Demo data.</p>`;
@@ -456,7 +514,7 @@ function renderBolt(){
   const setTxt = S.adapter && S.tool ? (S.angle === '90' ? `Crowfoot at 90°: set wrench to the final target` : b.target != null ? `Crowfoot in line: wrench setting ${f1(setting(b.target))} ${U} for a ${f1(b.target)} target` : `Crowfoot in line: setting = final target × ${factor().toFixed(3)}`) : '';
   const stripe = b.status === 'ok' ? `<div class="sub"><h3>Torque stripe</h3>${b.stripe ? `<div class="stripe">${b.stripe.img ? `<img class="thumb" src="${b.stripe.img}" alt="Torque stripe photo, bolt ${b.n}">` : ''}<div class="small"><b style="color:var(--${b.stripe.ok ? 'ok' : 'bad'})">${b.stripe.ok ? 'Stripe colour found' : 'No stripe seen'}</b> · ${b.stripe.pct.toFixed(1)}% of centre<br>${b.stripe.color} · ${hhmm(b.stripe.t)}</div></div>` : '<p class="small" style="margin:0">Apply the stripe, then photograph it.</p>'}
     <div class="row" style="margin-top:8px"><button class="btn" id="stripeBtn">${b.stripe ? 'Check again' : 'Check stripe'}</button><select id="stripeCol" aria-label="Stripe colour">${Object.keys(STRIPE).map(k => `<option ${k === S.stripeColor ? 'selected' : ''}>${k}</option>`).join('')}</select></div></div>` : '';
-  c.innerHTML = `<h2>Bolt ${b.n} <span>${isNext ? '<span class="pill p-next">Next in order</span> ' : ''}<span class="pill ${st[0]}">${st[1]}</span></span></h2>
+  c.innerHTML = `<h2><b class="tt">Bolt ${b.n}${PT('Accuracy')}</b><span>${isNext ? '<span class="pill p-next">Next in order</span> ' : ''}<span class="pill ${st[0]}">${st[1]}</span></span></h2>
     <div class="bolthead"><div><div class="big">${b.reading != null ? f1(b.reading) : '–'}<span style="font-size:20px"> ${U}</span></div>
       <div class="small">${b.t ? `Last reading ${hhmm(b.t)}${b.history.length > 1 ? ` · ${b.history.length} readings` : ''}${last && last.tool ? ` · ${last.tool}` : ''}` : 'Applied torque at the fastener'}</div></div>
       <div class="row"><button class="btn" id="prevBtn" aria-label="Previous bolt">◀</button><button class="btn" id="nextBtn" aria-label="Next bolt">▶</button></div></div>
@@ -474,7 +532,7 @@ function renderBolt(){
 function renderInspect(c, b){
   if (!b) { c.innerHTML = `<h2>Inspection</h2><p class="msg ok">All bolts confirmed. Complete the inspection below.</p>`; return; }
   const conf = S.insp.confirmed[b.n], h = b.history[b.history.length - 1] || {}, t = h.tool && TOOLS[h.tool];
-  c.innerHTML = `<h2>Inspect bolt ${b.n} <span><span class="pill ${conf ? 'p-conf' : 'p-open'}">${conf ? 'Confirmed' : 'To inspect'}</span></span></h2>
+  c.innerHTML = `<h2><b class="tt">Inspect bolt ${b.n}${PT('Safety')}</b><span><span class="pill ${conf ? 'p-conf' : 'p-open'}">${conf ? 'Confirmed' : 'To inspect'}</span></span></h2>
     <div class="bolthead"><div><div class="big">${b.reading != null ? f1(b.reading) : '–'}<span style="font-size:20px"> ${U}</span></div><div class="small">Target ${b.target != null ? f1(b.target) : TGT} ± ${TOL}</div></div>
     <div class="row"><button class="btn" id="prevBtn" aria-label="Previous bolt">◀</button><button class="btn" id="nextBtn" aria-label="Next bolt">▶</button></div></div>
     <ul class="facts"><li>Running torque <b>${b.run != null ? f1(b.run) : '—'} ${U}</b> (minimum ${f1(TASK.minRun)})${b.nutNew ? ` · new nut ${b.nutNew}` : ''}</li>
@@ -503,7 +561,7 @@ function renderTwin(){
   const runs = S.bolts.filter(b => b.run != null).map(b => b.run);
   if (runs.length >= 3) trend.push({d:'today', a:avg(runs)});
   const falling = trend.length > 1 && trend[trend.length - 1].a < trend[0].a - .3;
-  c.innerHTML = `<h2>Digital twin <span>panel 571AB on ${TASK.ac}</span></h2>
+  c.innerHTML = `${H('Digital twin', ['Efficiency'], 'panel 571AB on ' + TASK.ac)}
     <p class="small" style="margin:0 0 6px">Every visit's readings stay with this panel. Twin view paints them onto the bolts: green near target, amber drifting, red out of tolerance; purple dashes mark repeat problems.</p>
     <ul class="jobs">${TWIN.map(v => { const iss = Object.entries(v.issues); return `<li>${fmtDate(v.date)} · ${v.check} · ${12 - iss.length}/12 in spec first time${iss.length ? ' · ' + iss.map(([n, t]) => `bolt ${n} ${t}`).join('; ') : ''}</li>`; }).join('')}</ul>
     ${rec.length ? `<p class="msg sus">Repeat problem: bolt${rec.length > 1 ? 's' : ''} ${listNums(rec)} failed in 2 or more visits. Check the anchor nut and thread condition.</p>` : ''}
@@ -517,7 +575,7 @@ function renderFinish(){
   const c = $('finishCard'), ph = phase();
   let h = '';
   if (ph === 'work') {
-    h = `<h2>Finish, close out and sign off <span>thumbs up, hold</span></h2><div class="row"><button class="btn pri" id="finBtn">Finish task</button></div>`;
+    h = `${H('Finish, close out and sign off', ['Safety'], 'thumbs up, hold')}<div class="row"><button class="btn pri" id="finBtn">Finish task</button></div>`;
     if (S.finish && !S.finish.ok) h += `<p class="msg bad">${esc(S.finish.text)}</p>`;
     if (S.finish && S.finish.ok) {
       const out = Object.entries(S.out).filter(([, o]) => !o.ret), back = Object.entries(S.out).filter(([, o]) => o.ret);
@@ -530,20 +588,20 @@ function renderFinish(){
         ${ready ? '' : `<p class="small">${out.length ? 'Return every tool before signing.' : 'Tick the area check before signing.'}</p>`}</div>`;
     }
   } else if (ph === 'await') {
-    h = `<h2>Independent inspection <span>critical task (demo)</span></h2>
+    h = `${H('Independent inspection', ['Safety'], 'critical task (demo)')}
       <p class="msg info" style="margin-top:0">Signed off by <b>${esc(S.signed.tech)}</b> at ${hhmm(S.signed.t)}. A different qualified person must now inspect assembly and locking.</p>
       <div class="row"><label class="small" for="inspId">Inspector</label><input type="text" id="inspId" value="${esc(S.insp && S.insp.id || 'I-5678')}"><button class="btn pri" id="inspBtn">Start inspection</button></div>
       ${S.insp && S.insp.msg ? `<p class="msg bad">${esc(S.insp.msg)}</p>` : ''}${rejects()}`;
   } else if (ph === 'inspect') {
     const n = Object.keys(S.insp.confirmed).length, k = S.insp.checks;
-    h = `<h2>Inspection by ${esc(S.insp.id)} <span>${n} of 12 bolts confirmed</span></h2>
+    h = `${H('Inspection by ' + esc(S.insp.id), ['Safety'], n + ' of 12 bolts confirmed')}
       <div class="meter"><i style="width:${n / 12 * 100}%"></i></div>
       <label class="ck"><input type="checkbox" data-ck="assembly" ${k.assembly ? 'checked' : ''}> Correct assembly: right parts, fully seated</label>
       <label class="ck"><input type="checkbox" data-ck="locking" ${k.locking ? 'checked' : ''}> Locking: self-locking nuts and torque stripes</label>
       <label class="ck"><input type="checkbox" data-ck="operation" ${k.operation ? 'checked' : ''}> Sense of operation checked, or not applicable</label>
       <div class="row" style="margin-top:6px"><button class="btn pri" id="inspDone">Complete inspection</button></div>${S.insp.msg ? `<p class="msg bad">${esc(S.insp.msg)}</p>` : ''}${rejects()}`;
   } else {
-    h = `<h2>Task closed</h2><p class="msg ok" style="margin-top:0">Torqued and signed by <b>${esc(S.signed.tech)}</b> at ${hhmm(S.signed.t)}. Independently inspected by <b>${esc(S.insp.signed.id)}</b> at ${hhmm(S.insp.signed.t)}. Badge scans simulated.</p>${rejects()}`;
+    h = `${H('Task closed', ['Safety'])}<p class="msg ok" style="margin-top:0">Torqued and signed by <b>${esc(S.signed.tech)}</b> at ${hhmm(S.signed.t)}. Independently inspected by <b>${esc(S.insp.signed.id)}</b> at ${hhmm(S.insp.signed.t)}. Badge scans simulated.</p>${rejects()}`;
   }
   c.innerHTML = h;
   const on = (x, f) => { const el = $(x); if (el) el.onclick = f; };
@@ -1007,6 +1065,7 @@ function fire(L){
   else if (L === 'Closed_Fist') takePhoto();
   else if (L === 'Thumb_Up') finish('thumbs up');
   else if (L === 'OK') confirmBolt(S.active, 'OK sign');
+  else if (L === 'Victory') toggleManual();
 }
 const CONN = [[0,1],[1,2],[2,3],[3,4],[0,5],[5,6],[6,7],[7,8],[5,9],[9,10],[10,11],[11,12],[9,13],[13,14],[14,15],[15,16],[13,17],[0,17],[17,18],[18,19],[19,20]];
 function clearCanvas(){ const c = $('cv'); c.getContext('2d').clearRect(0, 0, c.width, c.height); }
@@ -1028,7 +1087,7 @@ document.querySelectorAll('[data-wbgt]').forEach(b => b.onclick = () => { const 
 $('photoBtn').onclick = takePhoto;
 $('csvDl').onclick = () => { try { const url = URL.createObjectURL(new Blob([csv()], {type:'text/csv'})); const a = document.createElement('a'); a.href = url; a.download = `torquetrace-${WO.no}.csv`; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 2000); log('Data log downloaded as CSV'); render(); } catch (e) { toast('Download not available here'); } };
 $('csvCopy').onclick = () => copyText(csv(), 'CSV copied');
-$('hoBtn').onclick = () => { const ta = $('hoText'); ta.value = handover(); ta.classList.remove('hidden'); $('copyBtn').disabled = false; log('Handover summary generated'); render(); };
+$('hoBtn').onclick = () => { const ta = $('hoText'); S.handed = true; ta.value = handover(); ta.classList.remove('hidden'); $('copyBtn').disabled = false; log('Handover summary generated'); render(); };
 $('copyBtn').onclick = async () => { const ta = $('hoText'); try { await navigator.clipboard.writeText(ta.value); toast('Summary copied', 'ok'); } catch (e) { ta.focus(); ta.select(); toast('Press copy on your keyboard or menu'); } };
 $('resetBtn').onclick = () => { const b = $('resetBtn'); if (Date.now() < resetArm) { disconnect(true); const keep = S.mode; S = fresh(); S.mode = keep; $('hoText').classList.add('hidden'); $('copyBtn').disabled = true; log('Task reset'); toast('Task reset'); b.textContent = 'Reset task'; resetArm = 0; render(); } else { resetArm = Date.now() + 3000; b.textContent = 'Tap again to reset'; setTimeout(() => { if (Date.now() >= resetArm) b.textContent = 'Reset task'; }, 3100); } };
 document.addEventListener('keydown', e => {
@@ -1037,7 +1096,7 @@ document.addEventListener('keydown', e => {
   if (k === 't' || k === ' ') { e.preventDefault(); if (S.toolState === 'connected') simPull(); else toast('Connect a wrench first', 'warn'); }
   else if (k === 'n') step(1); else if (k === 'b') step(-1);
   else if (k === 'g') { S.gestures = !S.gestures; log(`Gestures turned ${S.gestures ? 'on' : 'off'} (keyboard)`); render(); }
-  else if (k === 'p') takePhoto(); else if (k === 'f') finish('keyboard'); else if (k === 'o') confirmBolt(S.active, 'keyboard');
+  else if (k === 'p') takePhoto(); else if (k === 'm') toggleManual(); else if (k === 'f') finish('keyboard'); else if (k === 'o') confirmBolt(S.active, 'keyboard');
 });
 const setTop = () => document.documentElement.style.setProperty('--toph', $('top').offsetHeight + 'px');
 const topObs = new ResizeObserver(setTop); topObs.observe($('top'));
@@ -1047,7 +1106,7 @@ const teleTimer = setInterval(() => { if (S.toolState === 'connected' && S.mode 
 buildOverlay(); setTop();
 if (!S.log.length) log('Task opened: refit access panel 571AB');
 render();
-window.__tt = {S:() => S, handleCode, onTorque, handleHand, handleTwo, fire, finish, handover, analyzeStripe, confirmBolt, csv, fast:v => { FAST = v; }, teleTimer};
+window.__tt = {S:() => S, toggleManual, handleCode, onTorque, handleHand, handleTwo, fire, finish, handover, analyzeStripe, confirmBolt, csv, fast:v => { FAST = v; }, teleTimer};
 }
 </script>
 </body>

@@ -1,14 +1,19 @@
-# TorqueTrace prototype (v2)
+# TorqueTrace prototype (v3)
 
 A tablet web app for aircraft MRO that pins every torque reading to the right bolt, checks tools before and after use, error-proofs the job, and hands unfinished work to the next shift. School project concept for SIAEC operations, answering: *How can smart tools (e.g. digital torque wrenches, AR-assisted repair manuals) improve accuracy, efficiency and safety in MRO?*
 
 **Live version:** https://kqetlyn.github.io/prototype/ (open in Chrome on an Android tablet)
 
+## Core loop
+
+**Scan the tool → AR guides each bolt → the wrench records it → verified handover.** The app is organised in four steps (Prepare, Torque with AR, Verify, Hand over), and every feature is tagged with the pillar of the problem statement it serves: Accuracy, Efficiency or Safety.
+
 ## Features
 
 **AR and gestures (tablet camera)**
 - Panel overlay: each bolt shows its status (green in spec, red out of tolerance, orange out of order, purple suspect).
-- Gestures: open palm = gestures on/off · point = select bolt · two hands, fingers up = jump to that bolt · swipe = next/previous · fist = photo · OK sign = inspector confirms · thumbs up = finish.
+- AR task-card manual: the current step and its key values sit in the camera view; the full task card opens over the panel (Manual button or Victory gesture).
+- Gestures (6 core): open palm = gestures on/off · point = select bolt · swipe = next/previous · Victory = manual · OK sign = confirm · thumbs up = finish. Extras: fist = photo · two hands, fingers up = jump to that bolt.
 - Digital twin view (2D): past visits' readings painted on each bolt, drift colours, repeat-problem bolts, running-torque trend.
 - Hazard markers on the panel and live safety alerts in view.
 
@@ -77,6 +82,7 @@ Advertise as `TT-TW0042` with the Nordic UART service `6e400001-b5a3-f393-e0a9-e
 2. ~~Camera view and gestures~~
 3. ~~QR tool scan with checks~~
 4. ~~v2: tool history, traceability, nut and crowfoot correction, error-proofing, inspection, twin, alerts, data log~~
-5. AI chat: questions about the task card, voice defect logging, smarter handover
-6. Real ESP32 or NorTronic wrench over Bluetooth
-7. Marker-anchored AR on a real panel
+5. ~~v3: core-loop steps, pillar tags, AR task-card manual~~
+6. AI chat: questions about the task card, voice defect logging, smarter handover
+7. Real ESP32 or NorTronic wrench over Bluetooth
+8. Marker-anchored AR on a real panel
