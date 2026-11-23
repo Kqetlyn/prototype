@@ -11,24 +11,24 @@
 /* VOICE: a shipped hangar tool, calm and readable at arm's length
    IDEA: a task card clipped beside the aircraft panel being worked on
    PICTURE: live camera with the access panel overlaid; without camera, drawn aluminium skin and panel
-   COLOUR and TYPE: graphite or paper ground, aluminium greys, zinc-chromate accent, status green/red/orange; Barlow family
+   COLOUR and TYPE: graphite or paper ground, aluminium greys, zinc-chromate accent, status green/red/orange/purple; Barlow family
    LAYOUT: camera view left, task rail right; stacks under 900px */
-:root{color-scheme:light dark;--bg:light-dark(#eceeea,#0f1214);--card:light-dark(#ffffff,#181d20);--ink:light-dark(#151a1d,#e9ece8);--mute:light-dark(#596267,#9ba5a9);--line:light-dark(#d4d8d4,#2a3135);--tint:light-dark(#f4f5f2,#1e2427);--acc:#c4d33b;--acc-ink:#1c2108;--ok:#2db574;--bad:#e23b31;--warn:#ef8d24;--sel:#4aa3ff}
+:root{color-scheme:light dark;--bg:light-dark(#eceeea,#0f1214);--card:light-dark(#ffffff,#181d20);--ink:light-dark(#151a1d,#e9ece8);--mute:light-dark(#596267,#9ba5a9);--line:light-dark(#d4d8d4,#2a3135);--tint:light-dark(#f4f5f2,#1e2427);--acc:#c4d33b;--acc-ink:#1c2108;--ok:#2db574;--bad:#e23b31;--warn:#ef8d24;--sel:#4aa3ff;--sus:#9b6bff}
 :root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
 *{box-sizing:border-box;min-width:0}
 body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 Barlow,system-ui,sans-serif;overflow-x:clip}
-h1,h2,.cond{font-family:"Barlow Semi Condensed",Barlow,sans-serif}
+h1,h2,h3,.cond{font-family:"Barlow Semi Condensed",Barlow,sans-serif}
 button,select,input{font:inherit;color:inherit}
 .top{display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px;padding:10px max(2vw,14px);border-bottom:1px solid var(--line);background:var(--card)}
 .brand{margin:0;font-size:22px;font-weight:700;line-height:1;display:flex;align-items:baseline;gap:8px}
 .brand small{font:500 13px Barlow,sans-serif;color:var(--mute)}
-.task{flex:1 1 280px;font-size:15px;color:var(--mute)}.task b{color:var(--ink);font-weight:600}
+.task{flex:1 1 300px;font-size:15px;color:var(--mute)}.task b{color:var(--ink);font-weight:600}
 .chips{display:flex;flex-wrap:wrap;gap:6px}
 .chip{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;border:1px solid var(--line);font-size:13px;white-space:nowrap}
 .chip i{width:8px;height:8px;border-radius:50%;background:var(--mute)}
-.chip.on i{background:var(--ok)}.chip.warn i{background:var(--warn)}.chip.bad i{background:var(--bad)}
+.chip.on i{background:var(--ok)}.chip.warn i{background:var(--warn)}.chip.bad i{background:var(--bad)}.chip.sel i{background:var(--sel)}
 .chip.acc{background:var(--acc);color:var(--acc-ink);border-color:var(--acc)}.chip.acc i{background:var(--acc-ink)}
-main{display:grid;grid-template-columns:minmax(0,1.65fr) minmax(330px,1fr);height:calc(100dvh - var(--toph,58px))}
+main{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(340px,1fr);height:calc(100dvh - var(--toph,58px))}
 .vp{position:relative;overflow:hidden;background:#b3bac0;touch-action:manipulation;user-select:none}
 .vp video,.vp canvas,.vp svg.ov{position:absolute;inset:0;width:100%;height:100%}
 .vp video{object-fit:cover;display:none;background:#000}
@@ -40,71 +40,97 @@ main{display:grid;grid-template-columns:minmax(0,1.65fr) minmax(330px,1fr);heigh
 .plac{font:600 17px Barlow,sans-serif;fill:#6d777e}
 .live .skin{display:none}.live .pnl{fill:rgba(196,211,59,.08);stroke:var(--acc);stroke-dasharray:14 10}.live .pnl-in{display:none}
 .live .stencil,.live .plac{fill:rgba(255,255,255,.35)}
-.bolt{cursor:pointer}
+.bolt,.hz{cursor:pointer}
 .bolt .head{fill:#dfe3e6;stroke:#59636a;stroke-width:2}.bolt .slot{stroke:#59636a;stroke-width:3;stroke-linecap:round}
 .live .bolt .head{fill:rgba(15,18,20,.5);stroke:#fff;stroke-width:2.5}.live .bolt .slot{stroke:#fff}
 .bolt .ring{fill:none;stroke:transparent;stroke-width:6}
 .bolt .sel{fill:none;stroke:transparent;stroke-width:3;stroke-dasharray:7 6}
 .bolt .tag rect{fill:#2a3034}.bolt .tag text{fill:#fff;font:700 15px "Barlow Semi Condensed",sans-serif;text-anchor:middle;dominant-baseline:central}
 .bolt .mk{display:none}.bolt .mk circle{stroke:#fff;stroke-width:2}.bolt .mk text{fill:#fff;font:700 13px Barlow,sans-serif;text-anchor:middle;dominant-baseline:central}
-.s-ok .ring{stroke:var(--ok)}.s-bad .ring{stroke:var(--bad)}.s-seq .ring{stroke:var(--warn)}
-.s-ok .mk,.s-bad .mk,.s-seq .mk{display:inline}
-.s-ok .mk circle{fill:var(--ok)}.s-bad .mk circle{fill:var(--bad)}.s-seq .mk circle{fill:var(--warn)}
-.s-ok .tag rect{fill:var(--ok)}.s-bad .tag rect{fill:var(--bad)}.s-seq .tag rect{fill:var(--warn)}
+.bolt .tv,.bolt .td{display:none;text-anchor:middle;paint-order:stroke;stroke:#fff;stroke-width:4px}
+.bolt .tv{font:700 16px "Barlow Semi Condensed",sans-serif;fill:#151a1d}.bolt .td{font:600 12px Barlow,sans-serif;fill:#3b4246}
+.twin .bolt .tv,.twin .bolt .td{display:inline}
+.twin .dev0 .head{fill:#bfe8cf}.twin .dev1 .head{fill:#ffe1a6}.twin .dev2 .head{fill:#ffb3ad}
+.twin .rec .sel{stroke:var(--sus);stroke-dasharray:3 4}
+.s-ok .ring{stroke:var(--ok)}.s-bad .ring{stroke:var(--bad)}.s-seq .ring{stroke:var(--warn)}.s-sus .ring{stroke:var(--sus)}.s-rej .ring{stroke:var(--bad);stroke-dasharray:6 5}
+.s-ok .mk,.s-bad .mk,.s-seq .mk,.s-sus .mk,.s-rej .mk{display:inline}
+.s-ok .mk circle{fill:var(--ok)}.s-bad .mk circle,.s-rej .mk circle{fill:var(--bad)}.s-seq .mk circle{fill:var(--warn)}.s-sus .mk circle{fill:var(--sus)}
+.s-ok .tag rect{fill:var(--ok)}.s-bad .tag rect,.s-rej .tag rect{fill:var(--bad)}.s-seq .tag rect{fill:var(--warn)}.s-sus .tag rect{fill:var(--sus)}
+.conf .mk circle{fill:var(--sel)}
 .active .sel{stroke:var(--sel)}.active .tag rect{fill:var(--sel)}
+.hz path{fill:#ffcc29;stroke:#151a1d;stroke-width:2}.hz text{font:800 17px Barlow,sans-serif;fill:#151a1d;text-anchor:middle;dominant-baseline:central}
 @media (prefers-reduced-motion:no-preference){.active .sel{animation:spin 6s linear infinite;transform-box:fill-box;transform-origin:center}@keyframes spin{to{transform:rotate(360deg)}}}
-.hud{position:absolute;left:12px;top:12px;max-width:min(70%,420px);padding:8px 12px;border-radius:10px;background:rgba(15,18,20,.78);color:#fff;font-size:14px;line-height:1.35}
+.tl{position:absolute;left:12px;top:12px;display:grid;gap:6px;max-width:min(64%,420px)}
+.hud{padding:8px 12px;border-radius:10px;background:rgba(15,18,20,.78);color:#fff;font-size:14px;line-height:1.35}
 .hud b{font-weight:600}.hud .bar{height:5px;border-radius:3px;background:rgba(255,255,255,.2);margin-top:6px;overflow:hidden}.hud .bar i{display:block;height:100%;width:0;background:var(--acc)}
-.vpbtns{position:absolute;right:12px;top:12px;display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
-.vpbtns .btn{background:rgba(15,18,20,.78);color:#fff;border-color:rgba(255,255,255,.25)}
-.camnote{position:absolute;left:50%;bottom:64px;transform:translateX(-50%);width:min(92%,520px);padding:10px 14px;border-radius:10px;background:rgba(15,18,20,.85);color:#fff;font-size:14px;display:none}
+.al{padding:6px 10px;border-radius:8px;font-size:13px;font-weight:600;line-height:1.3}
+.al.warn{background:var(--warn);color:#2a1600}.al.bad{background:var(--bad);color:#fff}.al.sus{background:var(--sus);color:#fff}.al.info{background:rgba(15,18,20,.78);color:#fff}
+.vpbtns{position:absolute;right:12px;top:12px;display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;max-width:34%}
+.vpbtns .btn{background:rgba(15,18,20,.78);color:#fff;border-color:rgba(255,255,255,.25)}.vpbtns .btn.on{background:var(--acc);color:var(--acc-ink);border-color:var(--acc)}
+.camnote{position:absolute;left:50%;bottom:72px;transform:translateX(-50%);width:min(92%,520px);padding:10px 14px;border-radius:10px;background:rgba(15,18,20,.85);color:#fff;font-size:14px;display:none}
 .camnote.show{display:block}
 .cursor{position:absolute;width:46px;height:46px;margin:-23px 0 0 -23px;border-radius:50%;border:3px solid #fff;pointer-events:none;display:none;--p:0;background:conic-gradient(var(--acc) calc(var(--p)*1turn),transparent 0) border-box;-webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 9px),#000 calc(100% - 8px));mask:radial-gradient(farthest-side,transparent calc(100% - 9px),#000 calc(100% - 8px))}
-.toast{position:absolute;left:50%;bottom:64px;transform:translateX(-50%);max-width:90%;padding:10px 16px;border-radius:10px;background:#fff;color:#151a1d;font-weight:500;box-shadow:0 6px 20px rgba(0,0,0,.25);opacity:0;transition:opacity .2s;pointer-events:none}
-.toast.show{opacity:1}.toast.bad{background:var(--bad);color:#fff}.toast.warn{background:var(--warn);color:#2a1600}.toast.ok{background:var(--ok);color:#06231a}
+.toast{position:absolute;left:50%;bottom:72px;transform:translateX(-50%);max-width:90%;padding:10px 16px;border-radius:10px;background:#fff;color:#151a1d;font-weight:500;box-shadow:0 6px 20px rgba(0,0,0,.25);opacity:0;transition:opacity .2s;pointer-events:none}
+.toast.show{opacity:1}.toast.bad{background:var(--bad);color:#fff}.toast.warn{background:var(--warn);color:#2a1600}.toast.ok{background:var(--ok);color:#06231a}.toast.sus{background:var(--sus);color:#fff}
 .legend{position:absolute;left:0;right:0;bottom:0;display:flex;gap:6px;flex-wrap:wrap;padding:8px 12px;background:rgba(15,18,20,.72);color:#e9ece8;font-size:13px}
 .legend span{white-space:nowrap;padding:2px 8px;border-radius:6px;background:rgba(255,255,255,.08)}.legend b{font-weight:600;color:var(--acc)}
 .rail{overflow-y:auto;border-left:1px solid var(--line);padding:14px;display:grid;gap:12px;align-content:start}
 .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px}
-.card h2{margin:0 0 10px;font-size:18px;font-weight:600;display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.card.alert{border-color:var(--sus);border-width:2px}
+.card h2{margin:0 0 10px;font-size:18px;font-weight:600;display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap}
 .card h2 span{font:400 13px Barlow,sans-serif;color:var(--mute);text-align:right}
+.card h3{margin:12px 0 4px;font-size:16px;font-weight:600;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.sub{margin-top:14px;padding-top:4px;border-top:1px solid var(--line)}
 .btn{min-height:44px;padding:0 14px;border-radius:10px;border:1px solid var(--line);background:transparent;cursor:pointer;font-weight:500}
 .btn:hover{border-color:var(--mute)}.btn.pri{background:var(--acc);color:var(--acc-ink);border-color:var(--acc);font-weight:600}
-.btn:disabled{opacity:.45;cursor:not-allowed}.btn.wide{width:100%}
+.btn.danger{border-color:var(--bad);color:var(--bad)}
+.btn:disabled{opacity:.45;cursor:not-allowed}.btn.sm{min-height:36px;font-size:14px;padding:0 10px}
 .btn:focus-visible,.seg button:focus-visible,select:focus-visible,input:focus-visible,.tile:focus-visible{outline:3px solid var(--sel);outline-offset:2px}
 .row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
-.seg{display:inline-flex;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.seg{display:inline-flex;flex-wrap:wrap;border:1px solid var(--line);border-radius:10px;overflow:hidden}
 .seg button{min-height:44px;padding:0 12px;border:0;background:transparent;cursor:pointer}
 .seg button[aria-pressed=true]{background:var(--ink);color:var(--bg)}
 .muted{color:var(--mute);font-size:14px}.small{font-size:13px;color:var(--mute)}
 .big{font:600 clamp(40px,5vw,56px)/1 "Barlow Semi Condensed",sans-serif;font-variant-numeric:tabular-nums;white-space:nowrap}
-.bolthead{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;margin-bottom:10px}
-.pill{display:inline-block;padding:2px 9px;border-radius:999px;font-size:13px;font-weight:600;white-space:nowrap}
-.p-open{background:var(--tint);color:var(--mute)}.p-ok{background:var(--ok);color:#06231a}.p-bad{background:var(--bad);color:#fff}.p-seq{background:var(--warn);color:#2a1600}.p-next{background:var(--sel);color:#04203d}
-.meter{height:8px;border-radius:4px;background:var(--tint);overflow:hidden;margin:8px 0 2px}.meter i{display:block;height:100%;background:var(--ok);width:0}
+.bolthead{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;margin-bottom:8px}
+.facts{margin:0 0 10px;padding:0;list-style:none;font-size:14px}.facts li{padding:3px 0;border-bottom:1px solid var(--line)}.facts b{font-weight:600;font-variant-numeric:tabular-nums}
+.pill{display:inline-block;padding:2px 9px;border-radius:999px;font:600 13px Barlow,sans-serif;white-space:nowrap}
+.p-open{background:var(--tint);color:var(--mute)}.p-ok{background:var(--ok);color:#06231a}.p-bad,.p-rej{background:var(--bad);color:#fff}.p-seq{background:var(--warn);color:#2a1600}.p-next,.p-conf{background:var(--sel);color:#04203d}.p-sus{background:var(--sus);color:#fff}
+.meter{height:8px;border-radius:4px;background:var(--tint);overflow:hidden;margin:6px 0 4px}.meter i{display:block;height:100%;background:var(--ok);width:0}.meter.warn i{background:var(--warn)}.meter.bad i{background:var(--bad)}
 .msg{margin:10px 0 0;padding:10px 12px;border-radius:10px;background:var(--tint);font-size:14px}
-.msg.bad{background:color-mix(in srgb,var(--bad) 16%,var(--card))}.msg.warn{background:color-mix(in srgb,var(--warn) 18%,var(--card))}.msg.ok{background:color-mix(in srgb,var(--ok) 18%,var(--card))}
-.tools dl{display:grid;grid-template-columns:auto 1fr;gap:2px 12px;margin:8px 0;font-size:14px}.tools dt{color:var(--mute)}.tools dd{margin:0;font-variant-numeric:tabular-nums}
+.msg.bad{background:color-mix(in srgb,var(--bad) 16%,var(--card))}.msg.warn{background:color-mix(in srgb,var(--warn) 18%,var(--card))}.msg.ok{background:color-mix(in srgb,var(--ok) 18%,var(--card))}.msg.sus{background:color-mix(in srgb,var(--sus) 16%,var(--card))}.msg.info{background:color-mix(in srgb,var(--sel) 14%,var(--card))}
+.tools dl{display:grid;grid-template-columns:auto 1fr;gap:2px 12px;margin:4px 0 8px;font-size:14px}.tools dt{color:var(--mute)}.tools dd{margin:0;font-variant-numeric:tabular-nums}
 .check{display:flex;gap:8px;align-items:baseline;font-size:14px}.check b{width:18px;flex:none;text-align:center}.check.y b{color:var(--ok)}.check.n b{color:var(--bad)}
-.demo{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}.demo .btn{min-height:36px;font-size:14px;padding:0 10px}
+.demo{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;align-items:center}
 .bl{display:grid;grid-template-columns:repeat(auto-fill,minmax(68px,1fr));gap:6px}
-.tile{border:2px solid var(--line);border-radius:10px;background:var(--tint);padding:6px 4px;text-align:center;cursor:pointer;min-height:56px}
-.tile b{display:block;font:600 18px/1.1 "Barlow Semi Condensed",sans-serif}.tile small{font-size:12px;color:var(--mute);font-variant-numeric:tabular-nums}
-.tile.ok{border-color:var(--ok)}.tile.bad{border-color:var(--bad)}.tile.seq{border-color:var(--warn)}.tile.act{outline:3px solid var(--sel);outline-offset:1px}
+.tile{border:2px solid var(--line);border-radius:10px;background:var(--tint);padding:6px 4px;text-align:center;cursor:pointer;min-height:58px}
+.tile b{display:block;font:600 18px/1.1 "Barlow Semi Condensed",sans-serif}.tile small{display:block;font-size:12px;color:var(--mute);font-variant-numeric:tabular-nums}
+.tile.ok{border-color:var(--ok)}.tile.bad{border-color:var(--bad)}.tile.seq{border-color:var(--warn)}.tile.sus{border-color:var(--sus)}.tile.rej{border-color:var(--bad);border-style:dashed}
+.tile.conf{background:color-mix(in srgb,var(--sel) 16%,var(--tint))}.tile.act{outline:3px solid var(--sel);outline-offset:1px}
 .photos{display:flex;gap:8px;overflow-x:auto}.photos figure{margin:0;flex:none;width:120px}.photos img{width:120px;height:90px;object-fit:cover;border-radius:8px;display:block;background:var(--tint)}.photos figcaption{font-size:12px;color:var(--mute)}
-textarea{width:100%;min-height:190px;font:14px/1.45 Barlow,sans-serif;padding:10px;border-radius:10px;border:1px solid var(--line);background:var(--tint);color:var(--ink);resize:vertical}
-input[type=text]{min-height:44px;padding:0 10px;border-radius:10px;border:1px solid var(--line);background:var(--tint);width:9em;font-size:16px}
-.log{margin:0;padding:0;list-style:none;font-size:13px;max-height:200px;overflow:auto}.log li{padding:4px 0;border-bottom:1px solid var(--line)}.log time{color:var(--mute);font-variant-numeric:tabular-nums;margin-right:6px}
+.thumb{width:110px;height:82px;object-fit:cover;border-radius:8px;display:block;background:var(--tint)}
+.stripe{display:flex;gap:10px;align-items:center;margin-top:6px}
+textarea{width:100%;min-height:200px;font:14px/1.45 Barlow,sans-serif;padding:10px;border-radius:10px;border:1px solid var(--line);background:var(--tint);color:var(--ink);resize:vertical}
+input[type=text],select{min-height:44px;padding:0 10px;border-radius:10px;border:1px solid var(--line);background:var(--tint);font-size:16px}
+input[type=text]{width:8em}
+label.ck{display:flex;gap:10px;align-items:flex-start;min-height:40px;padding:4px 0;font-size:15px;cursor:pointer}label.ck input{width:22px;height:22px;margin-top:2px;flex:none;accent-color:var(--ok)}
+.items{margin:6px 0 0;padding:0;list-style:none;font-size:14px}.items li{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--line)}
+.rm{width:22px;height:22px;border-radius:50%;display:inline-grid;place-items:center;font-size:13px;font-weight:700;flex:none}.rm.ok{background:var(--ok);color:#06231a}.rm.warn{background:var(--warn);color:#2a1600}.rm.bad{background:var(--bad);color:#fff}
+.jobs{margin:6px 0 0;padding-left:18px;font-size:13px}.jobs li{padding:2px 0}
+.fig{position:relative;height:170px;margin:4px 0 8px}.fig>canvas{position:absolute;inset:0;width:100%;height:100%}
+.tiles{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}.tiles div{background:var(--tint);border-radius:10px;padding:6px 8px}.tiles small{display:block;font-size:12px;color:var(--mute)}.tiles b{font:600 18px "Barlow Semi Condensed",sans-serif;font-variant-numeric:tabular-nums;white-space:nowrap}
+.scroll{overflow-x:auto}table.dl{width:100%;border-collapse:collapse;font-size:13px}table.dl th,table.dl td{padding:5px 6px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap}table.dl th{color:var(--mute);font-weight:600}table.dl .num{text-align:right;font-variant-numeric:tabular-nums}
+.log{margin:0;padding:0;list-style:none;font-size:13px;max-height:220px;overflow:auto}.log li{padding:4px 0;border-bottom:1px solid var(--line)}.log time{color:var(--mute);font-variant-numeric:tabular-nums;margin-right:6px}
 details summary{cursor:pointer;font-weight:600;min-height:32px}details p,details li{font-size:14px}details code{font-size:13px;overflow-wrap:anywhere}
 .hidden{display:none!important}
 @media (max-width:900px){main{display:block;height:auto}.vp{aspect-ratio:10/8;max-height:72vh;width:100%}.rail{border-left:0;overflow:visible}}
-@media (max-width:600px){.vp{aspect-ratio:4/5}.vp svg.ov{top:64px;bottom:92px;height:auto}.legend{font-size:12px;padding:6px 8px}.hud{font-size:13px;max-width:calc(100% - 150px);left:8px;top:8px;padding:6px 10px}.vpbtns{right:8px;top:8px}.vpbtns .btn{min-height:40px;padding:0 10px}.camnote,.toast{bottom:100px}}
+@media (max-width:600px){.vp{aspect-ratio:4/5}.vp svg.ov{top:64px;bottom:110px;height:auto}.legend{font-size:12px;padding:6px 8px}.tl{left:8px;top:8px;max-width:calc(100% - 140px)}.hud{font-size:13px;padding:6px 10px}.vpbtns{right:8px;top:8px;max-width:130px}.vpbtns .btn{min-height:38px;padding:0 10px;font-size:14px}.camnote,.toast{bottom:118px}.tiles{grid-template-columns:repeat(2,minmax(0,1fr))}}
 </style>
 </head>
 <body>
 <header class="top" id="top">
-  <h1 class="brand">TorqueTrace <small>prototype</small></h1>
-  <div class="task"><b>Refit access panel 571AB</b> · 12 bolts · 25.0 N·m ± 1.0 · tighten in numbered order</div>
+  <h1 class="brand">TorqueTrace <small>prototype v2</small></h1>
+  <div class="task"><b>Refit access panel 571AB</b> · 9V-ZZC · 12 self-locking anchor nuts · 25.0 N·m ± 1.0 plus running torque · critical task (demo)</div>
   <div class="chips" id="chips"></div>
 </header>
 <main>
@@ -113,22 +139,36 @@ details summary{cursor:pointer;font-weight:600;min-height:32px}details p,details
     <svg class="ov" id="ov" viewBox="0 0 1000 700" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Access panel with 12 numbered bolts"></svg>
     <canvas id="cv"></canvas>
     <div class="cursor" id="cursor"></div>
-    <div class="hud" id="hud"></div>
+    <div class="tl"><div class="hud" id="hud"></div><div id="alerts" style="display:grid;gap:4px" role="status" aria-live="polite"></div></div>
     <div class="vpbtns">
       <button class="btn" id="camBtn">Start camera</button>
       <button class="btn hidden" id="flipBtn">Flip camera</button>
+      <button class="btn" id="twinBtn" aria-pressed="false">Twin view</button>
     </div>
     <div class="camnote" id="camnote"></div>
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
     <div class="legend" aria-label="Gesture guide">
-      <span><b>Open palm, hold</b> gestures on/off</span><span><b>Point</b> select bolt</span><span><b>Swipe</b> next/prev bolt</span><span><b>Fist, hold</b> photo</span><span><b>Thumbs up, hold</b> finish task</span>
+      <span><b>Open palm, hold</b> gestures on/off</span><span><b>Point</b> select bolt</span><span><b>Two hands, fingers up</b> jump to that bolt</span><span><b>Swipe</b> next/prev</span><span><b>Fist, hold</b> photo</span><span><b>OK sign, hold</b> inspector confirms</span><span><b>Thumbs up, hold</b> finish</span>
     </div>
   </section>
   <aside class="rail">
+    <section class="card" id="woCard"></section>
     <section class="card tools" id="toolCard"></section>
+    <section class="card alert hidden" id="impactCard"></section>
     <section class="card" id="boltCard"></section>
     <section class="card"><h2>All bolts <span id="blSum"></span></h2><div class="bl" id="bl"></div></section>
+    <section class="card" id="liveCard"><h2>Live data <span id="liveSub">simulated sensors</span></h2>
+      <div class="fig" id="curveFig"><canvas id="curve" aria-label="Torque against time for the latest pull"></canvas></div>
+      <div class="tiles" id="tiles"></div>
+      <div class="sub"><h3>Work area heat <span class="pill" id="heatPill"></span></h3><p class="small" id="heatText" style="margin:0 0 8px"></p>
+        <div class="seg" role="group" aria-label="Simulated WBGT"><button data-wbgt="29.6">29.6 °C</button><button data-wbgt="31.4">31.4 °C</button><button data-wbgt="32.4">32.4 °C</button><button data-wbgt="33.5">33.5 °C</button></div>
+        <p class="small">WBGT bands from MOM's heat stress framework for outdoor work, such as line maintenance on the apron. Demo sensor values.</p></div></section>
+    <section class="card" id="twinCard"></section>
     <section class="card" id="finishCard"></section>
+    <section class="card"><h2>Data log <span id="dataSum"></span></h2>
+      <div class="scroll"><table class="dl"><thead><tr><th>Time</th><th>Bolt</th><th class="num">Applied</th><th class="num">Target</th><th class="num">Running</th><th>Tool</th><th>Result</th></tr></thead><tbody id="dataBody"></tbody></table></div>
+      <ul class="jobs" id="partsList"></ul>
+      <div class="row" style="margin-top:8px"><button class="btn" id="csvDl">Download CSV</button><button class="btn" id="csvCopy">Copy CSV</button></div></section>
     <section class="card"><h2>Handover summary <span>template; AI version in stage 4</span></h2>
       <div class="row"><button class="btn" id="hoBtn">Generate</button><button class="btn" id="copyBtn" disabled>Copy</button></div>
       <textarea id="hoText" class="hidden" readonly aria-label="Handover summary"></textarea></section>
@@ -138,60 +178,99 @@ details summary{cursor:pointer;font-weight:600;min-height:32px}details p,details
     <section class="card"><h2>Event log</h2><ul class="log" id="log"></ul></section>
     <section class="card">
       <details><summary>Run it on a tablet</summary>
-        <ol><li>Save this file as <code>index.html</code> and put it in a GitHub repository.</li>
-        <li>In the repository, open Settings → Pages and deploy from your main branch. You get an https link.</li>
-        <li>Open that link in Chrome on an Android tablet, tap Start camera and allow the camera. The gesture model downloads the first time.</li>
-        <li>Camera, gestures and Bluetooth do not run inside the Claude preview. Tapping, the simulated wrench and QR from a photo do.</li></ol></details>
+        <ol><li>Open the GitHub Pages link in Chrome on an Android tablet.</li>
+        <li>Tap Start camera and allow the camera. The gesture model downloads the first time.</li>
+        <li>Camera, gestures, Bluetooth and file downloads do not run inside the Claude preview. Tapping, the simulated wrench and QR or stripe photos do.</li></ol></details>
       <details><summary>What is simulated</summary>
-        <p>Wrench readings, the tool register, the staff badge scan and the panel position (the overlay is fixed on screen; a later version anchors it to markers on the real panel). Torque values and the bolt order are demo values, not from a maintenance manual.</p></details>
+        <p>Wrench readings, running torque, live torque curves, battery and signal, drops and overloads, the tool register and history, bench check results, the heat sensor, staff badge scans, the digital twin's past visits and the panel position (the overlay is fixed on screen; a later version anchors it to markers on the real panel). Torque values, minimum running torque, bolt order, part lots and aircraft registrations are demo values, not from a maintenance manual. The torque stripe check only looks for the stripe colour; a trained model would also check alignment.</p></details>
+      <details><summary>Real Bluetooth tools</summary>
+        <p>Best fit: Norbar NorTronic (open plain-text Bluetooth protocol: set targets, read results, stream live torque, read calibration date, disable the tool). Also Tohnichi CEM3-G-BTD/BTA (duplex limits), Stahlwille MANOSKOP 766 DAPTIQ HCT, and Sylvac or Mitutoyo Bluetooth gauges. Tools that act as Bluetooth keyboards (HID) can't be reached by Web Bluetooth; their readings can be typed into a focused field instead.</p></details>
       <details><summary>ESP32 wrench (stage 5)</summary>
-        <p>Advertise as <code>TT-TW0042</code> with the Nordic UART service <code>6e400001-b5a3-f393-e0a9-e50e24dcca9e</code>. Send lines on the TX characteristic: <code>TQ:25.3</code> for a reading and <code>ID:TW-0042</code> when asked with <code>ID?</code>. Switch the wrench mode to Bluetooth before connecting.</p></details>
+        <p>Advertise as <code>TT-TW0042</code> with the Nordic UART service <code>6e400001-b5a3-f393-e0a9-e50e24dcca9e</code>. Send lines on the TX characteristic: <code>LV:12.4</code> live torque samples, <code>RT:2.6</code> running torque, <code>TQ:27.8</code> peak torque at the wrench drive, <code>BT:84</code> battery %, <code>EV:DROP</code> and <code>EV:OVER</code> from the motion sensor, and <code>ID:TW-0042</code> when asked with <code>ID?</code>. With a crowfoot fitted in line, the app converts the drive reading to torque at the fastener.</p></details>
       <details><summary>Keyboard shortcuts</summary>
-        <p>T or Space: simulated pull · N / B: next / previous bolt · G: gestures on/off · P: photo · F: finish task</p></details>
+        <p>T or Space: simulated pull · N / B: next / previous bolt · G: gestures on/off · P: photo · F: finish · O: inspector confirms bolt</p></details>
       <div class="row" style="margin-top:10px"><button class="btn" id="resetBtn">Reset task</button></div>
     </section>
   </aside>
 </main>
 <input type="file" id="qrFile" accept="image/*" capture="environment" class="hidden">
 <input type="file" id="phFile" accept="image/*" capture="environment" class="hidden">
+<input type="file" id="stFile" accept="image/*" capture="environment" class="hidden">
 <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
 <script>
 {
 const $ = id => document.getElementById(id);
-const SPEC = {target:25.0, tol:1.0, unit:'N·m'};
-const TGT = SPEC.target.toFixed(1), TOL = SPEC.tol.toFixed(1);
+const TASK = {title:'Refit access panel 571AB', ac:'9V-ZZC', target:25.0, tol:1.0, unit:'N·m', minRun:1.0, critical:true,
+  hazards:[{x:390, y:252, title:'Hydraulic line behind panel', text:'Confirm the system is depressurised before refitting, as the task card requires.'},
+           {x:610, y:470, title:'Sharp panel edges', text:'Wear cut-resistant gloves when handling the panel.'}]};
+const TGT = TASK.target.toFixed(1), TOL = TASK.tol.toFixed(1), U = TASK.unit;
+const WO = {no:'WO-26-118734', date:new Date().toISOString().slice(0, 10)};
+const SAFETY = [['safe', 'Aircraft made safe for the task: systems depressurised or isolated as the task card says'], ['tags', 'Warning notices and "do not operate" tags placed'], ['ppe', 'PPE on: eye protection and gloves']];
 const POS = [[444,178],[444,522],[556,178],[556,522],[752,283],[248,283],[752,417],[248,417],[332,178],[668,522],[668,178],[332,522]];
-const REGISTER = {
-  'TW-0042':{id:'TW-0042',type:'Click torque wrench with smart adapter',min:5,max:60,cal:'2027-03-01'},
-  'TW-0043':{id:'TW-0043',type:'Click torque wrench with smart adapter',min:5,max:60,cal:'2026-10-15'},
-  'TW-0050':{id:'TW-0050',type:'Click torque wrench, large',min:40,max:200,cal:'2027-06-30'}
+const TOOLS = {
+  'TW-0042':{id:'TW-0042',kind:'wrench',type:'Click torque wrench, smart adapter',min:5,max:60,L:300,calDone:'2026-03-02',calDue:'2027-03-01',cycles:4610,limit:5000},
+  'TW-0044':{id:'TW-0044',kind:'wrench',type:'Click torque wrench, smart adapter',min:5,max:60,L:300,calDone:'2026-08-11',calDue:'2027-08-10',cycles:1230,limit:5000},
+  'TW-0043':{id:'TW-0043',kind:'wrench',type:'Click torque wrench, smart adapter',min:5,max:60,L:300,calDone:'2025-10-16',calDue:'2026-10-15',cycles:3880,limit:5000},
+  'TW-0061':{id:'TW-0061',kind:'wrench',type:'Click torque wrench, smart adapter',min:5,max:60,L:300,calDone:'2026-06-20',calDue:'2027-06-19',cycles:5012,limit:5000},
+  'TW-0050':{id:'TW-0050',kind:'wrench',type:'Click torque wrench, large',min:40,max:200,L:600,calDone:'2026-07-01',calDue:'2027-06-30',cycles:820,limit:5000},
+  'CF-0012':{id:'CF-0012',kind:'adapter',type:'Crowfoot adapter, 13 mm',E:30},
+  'CF-0025':{id:'CF-0025',kind:'adapter',type:'Crowfoot adapter, 19 mm',E:50}
 };
+const HISTORY = {
+  'TW-0042':[
+    {date:'2026-11-21',ac:'9V-ZZA',task:'Refit fairing panel 196BL',bolts:16,tech:'T-2210'},
+    {date:'2026-11-19',ac:'9V-ZZD',task:'Install fuel pump access cover',bolts:8,tech:'T-1234'},
+    {date:'2026-11-12',ac:'9V-ZZB',task:'Refit gear bay panel 711CR',bolts:22,tech:'T-3302'},
+    {date:'2026-10-30',ac:'9V-ZZA',task:'Refit wing panel 574BB',bolts:12,tech:'T-1890'},
+    {date:'2026-09-14',ac:'9V-ZZE',task:'Install galley drain fitting',bolts:4,tech:'T-2210'},
+    {date:'2026-02-20',ac:'9V-ZZF',task:'Refit belly panel 191DL',bolts:14,tech:'T-3302'}],
+  'TW-0044':[
+    {date:'2026-11-20',ac:'9V-ZZB',task:'Refit access panel 811AR',bolts:10,tech:'T-1890'},
+    {date:'2026-10-02',ac:'9V-ZZD',task:'Install antenna doubler',bolts:6,tech:'T-2210'}]
+};
+const TWIN = [
+  {date:'2026-05-14', check:'A-check', run:[2.4,2.6,2.3,2.7,2.2,2.6,2.5,2.8,2.4,2.6,2.3,2.5], dev:{0:.2, 3:-.3, 6:1.6, 9:.4}, issues:{7:'over-torqued, re-torqued'}},
+  {date:'2025-11-03', check:'A-check', run:[2.7,0.6,2.6,2.9,2.5,2.8,2.7,3.0,2.6,2.8,2.6,2.7], dev:{4:.3, 6:-1.8}, issues:{2:'worn nut replaced', 7:'under-torqued, re-torqued'}},
+  {date:'2025-05-21', check:'A-check', run:[3.0,2.9,2.9,3.1,2.8,3.0,3.0,3.2,2.9,3.1,2.9,3.0], dev:{}, issues:{}}];
+TWIN.forEach(v => v.r = v.run.map((r, i) => Math.round((TASK.target + r + (v.dev[i] || 0)) * 10) / 10));
+const STRIPE = {orange:[12,42], yellow:[44,68], green:[80,165], blue:[185,250], red:[340,12]};
 const MP = 'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@1.1.1';
 const MODEL = 'https://storage.googleapis.com/mediapipe-models/gesture_recognizer/gesture_recognizer/float16/1/gesture_recognizer.task';
 const NUS = '6e400001-b5a3-f393-e0a9-e50e24dcca9e', NUS_RX = '6e400002-b5a3-f393-e0a9-e50e24dcca9e', NUS_TX = '6e400003-b5a3-f393-e0a9-e50e24dcca9e';
-const KEY = 'torquetrace-proto-v1';
-const HOLD = {Open_Palm:1000, Closed_Fist:900, Thumb_Up:900};
-const LABEL = {Open_Palm:'Open palm', Closed_Fist:'Fist', Thumb_Up:'Thumbs up', Point:'Pointing', None:'Hand seen', Victory:'Victory', Thumb_Down:'Thumbs down', Pointing_Up:'Pointing up', ILoveYou:'Hand sign'};
+const KEY = 'torquetrace-proto-v2';
+const HOLD = {Open_Palm:1000, Closed_Fist:900, Thumb_Up:900, OK:900};
+const LABEL = {Open_Palm:'Open palm', Closed_Fist:'Fist', Thumb_Up:'Thumbs up', OK:'OK sign', Point:'Pointing', None:'Hand seen', Victory:'Victory', Thumb_Down:'Thumbs down', Pointing_Up:'Pointing up', ILoveYou:'Hand sign'};
+const STAT = {open:['p-open','Not torqued'], ok:['p-ok','In spec'], bad:['p-bad','Out of tolerance'], seq:['p-seq','Out of sequence'], sus:['p-sus','Suspect: tool failed'], rej:['p-rej','Rejected at inspection']};
+const REJECT = ['Torque stripe missing or broken', 'Fastener or nut damaged', 'Wrong part fitted', 'Other: see notes'];
+const FRAMED = window.self !== window.top;
 
-const fresh = () => ({bolts:POS.map((p,i)=>({n:i+1,status:'open',reading:null,kind:null,t:null,history:[]})),active:1,tool:null,toolState:'none',mode:'sim',outcome:'in',gestures:false,photos:[],log:[],finish:null,signed:null,tech:'T-1234'});
+const fresh = () => ({bolts:POS.map((p, i) => ({n:i+1, status:'open', kind:null, reading:null, run:null, target:null, tool:null, t:null, note:'', stripe:null, nutNew:null, history:[]})),
+  active:1, tool:null, toolState:'none', adapter:null, angle:'inline', mode:'sim', outcome:'in', gestures:false, photos:[], log:[],
+  finish:null, out:{}, areaClear:false, signed:null, tech:'T-1234', insp:null, impact:null, tools:{}, stripeColor:'orange',
+  safety:{safe:false, tags:false, ppe:false}, lockOrder:true, twin:false, wbgt:29.6, tele:{batt:86, rssi:-58, temp:31.2}, parts:[], curve:null});
 let S = fresh();
-try { const saved = JSON.parse(localStorage.getItem(KEY)); if (saved && saved.bolts && saved.bolts.length === 12) { S = Object.assign(fresh(), saved); if (S.toolState === 'connected' || S.toolState === 'connecting') S.toolState = 'checked'; S.gestures = false; } } catch (e) {}
+try { const saved = JSON.parse(localStorage.getItem(KEY)); if (saved && saved.bolts && saved.bolts.length === 12) { S = Object.assign(fresh(), saved); if (S.toolState !== 'none') S.toolState = S.tool ? 'checked' : 'none'; S.gestures = false; if (S.insp) S.insp.msg = ''; } } catch (e) {}
 const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} };
 
 const cam = {stream:null, facing:'environment', mirror:false};
-const G = {cand:null, t0:0, p0:null, fired:false, cool:0, hist:[], dwellB:null, dwellT:0, scanUntil:0};
-let rec = null, recState = 'idle', raf = 0, lastVT = -1, lastScan = 0, scanBusy = false, lastCode = '', lastCodeT = 0, ble = null, toastTimer = 0, resetArm = 0;
+const G = {cand:null, t0:0, p0:null, fired:false, cool:0, hist:[], dwellB:null, dwellT:0, scanUntil:0, count:-1, ct0:0, cfired:false, run:null, live:null};
+let rec = null, recState = 'idle', raf = 0, lastVT = -1, lastScan = 0, scanBusy = false, lastCode = '', lastCodeT = 0, ble = null, toastTimer = 0, resetArm = 0, pulling = false, FAST = false;
 
-const now = () => new Date();
 const hhmm = d => new Date(d).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
 const fmtDate = s => new Date(s + 'T00:00:00').toLocaleDateString([], {day:'2-digit', month:'short', year:'numeric'});
+const f1 = v => (Math.round(v * 10) / 10).toFixed(1);
 const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const bolt = n => S.bolts[n - 1];
 const nextExpected = () => { const b = S.bolts.find(b => b.status !== 'ok'); return b ? b.n : null; };
 const listNums = a => a.length ? a.join(', ') : 'none';
+const TS = id => S.tools[id] || (S.tools[id] = {cycles:TOOLS[id].cycles || 0, drops:0, overloads:0, quar:null, events:[]});
+const phase = () => S.insp && S.insp.signed ? 'closed' : S.insp && S.insp.active ? 'inspect' : S.signed ? 'await' : 'work';
+const locked = () => phase() !== 'work';
+const safetyDone = () => SAFETY.every(([k]) => S.safety[k]);
+const today0 = () => { const d = new Date(); d.setHours(0, 0, 0, 0); return d; };
 
-function log(text){ S.log.unshift({t:Date.now(), text}); S.log = S.log.slice(0, 60); }
-function toast(text, kind){ const el = $('toast'); el.textContent = text; el.className = 'toast show ' + (kind || ''); clearTimeout(toastTimer); toastTimer = setTimeout(() => el.className = 'toast', 2800); }
+function log(text){ S.log.unshift({t:Date.now(), text}); S.log = S.log.slice(0, 80); }
+function toast(text, kind){ const el = $('toast'); el.textContent = text; el.className = 'toast show ' + (kind || ''); clearTimeout(toastTimer); toastTimer = setTimeout(() => el.className = 'toast', 3000); }
 
 function buildOverlay(){
   let skin = '<g class="skin">';
@@ -201,230 +280,576 @@ function buildOverlay(){
   const bolts = POS.map(([x, y], i) => `<g class="bolt" data-n="${i+1}" transform="translate(${x} ${y})" role="button" aria-label="Bolt ${i+1}">
     <circle class="sel" r="36"/><circle class="ring" r="26"/><circle class="head" r="16"/><path class="slot" d="M-8 0H8M0-8V8"/>
     <g class="tag" transform="translate(26 -26)"><rect x="-14" y="-12" width="28" height="24" rx="6"/><text>${i+1}</text></g>
-    <g class="mk" transform="translate(-24 24)"><circle r="11"/><text class="mkt"></text></g></g>`).join('');
+    <g class="mk" transform="translate(-24 24)"><circle r="11"/><text class="mkt"></text></g>
+    ${x < 300 || x > 700 ? `<text class="tv" x="${x < 300 ? -38 : 38}" y="-2" style="text-anchor:${x < 300 ? 'end' : 'start'}"></text><text class="td" x="${x < 300 ? -38 : 38}" y="14" style="text-anchor:${x < 300 ? 'end' : 'start'}"></text>` : `<text class="tv" y="${y > 350 ? -46 : 58}"></text><text class="td" y="${y > 350 ? -30 : 74}"></text>`}</g>`).join('');
+  const hz = TASK.hazards.map((h, i) => `<g class="hz" data-h="${i}" transform="translate(${h.x} ${h.y})" role="button" aria-label="Hazard: ${esc(h.title)}"><path d="M0-18L17 13H-17Z"/><text y="2">!</text></g>`).join('');
   $('ov').innerHTML = skin + `<rect class="pnl" x="220" y="150" width="560" height="400" rx="18"/><rect class="pnl-in" x="234" y="164" width="532" height="372" rx="12"/>
-    <text class="stencil" x="500" y="368" text-anchor="middle">571AB</text><text class="plac" x="500" y="410" text-anchor="middle">Tighten in numbered order</text>` + bolts;
+    <text class="stencil" x="500" y="368" text-anchor="middle">571AB</text><text class="plac" x="500" y="410" text-anchor="middle">Tighten in numbered order</text>` + hz + bolts;
   $('ov').querySelectorAll('.bolt').forEach(g => g.addEventListener('click', () => select(+g.dataset.n, 'tap')));
+  $('ov').querySelectorAll('.hz').forEach(g => g.addEventListener('click', () => { const h = TASK.hazards[+g.dataset.h]; toast(`${h.title}: ${h.text}`, 'warn'); log(`Hazard viewed: ${h.title}`); render(); }));
 }
 
-function toolChecks(t){
-  const today = new Date(); today.setHours(0,0,0,0);
-  const calOk = new Date(t.cal + 'T00:00:00') >= today;
-  const rangeOk = t.min <= SPEC.target - SPEC.tol && t.max >= SPEC.target + SPEC.tol;
-  return {calOk, rangeOk, ok: calOk && rangeOk};
+function checks(id){
+  const t = TOOLS[id], s = TS(id);
+  const cal = new Date(t.calDue + 'T00:00:00') >= today0();
+  const cyc = s.cycles < t.limit;
+  const range = t.min <= TASK.target - TASK.tol && t.max >= TASK.target + TASK.tol + 5;
+  const health = !s.quar;
+  return {cal, cyc, range, health, ok:cal && cyc && range && health};
 }
+const factor = () => { const a = S.adapter && TOOLS[S.adapter], t = S.tool && TOOLS[S.tool]; return a && t && S.angle === 'inline' ? t.L / (t.L + a.E) : 1; };
+const setting = target => target * factor();
+function reminders(){
+  if (!S.tool) return [];
+  const t = TOOLS[S.tool], s = TS(S.tool), left = t.limit - s.cycles, need = S.bolts.filter(b => b.status !== 'ok').length + 4;
+  const days = Math.round((new Date(t.calDue + 'T00:00:00') - today0()) / 864e5);
+  return [{k:days < 0 ? 'bad' : days <= 30 ? 'warn' : 'ok', text:days < 0 ? `${S.tool} calibration overdue by ${-days} days` : `${S.tool} calibration due ${fmtDate(t.calDue)} (${days} days)${days <= 30 ? ': book it now' : ''}`},
+    {k:left <= 0 ? 'bad' : left < need ? 'warn' : 'ok', text:left <= 0 ? `${S.tool} has reached its cycle limit` : `${S.tool}: ${left.toLocaleString()} cycles left; this job needs about ${need}${left < need ? ': may hit the limit mid-job' : ''}`}];
+}
+function heat(w){
+  if (w >= 33) return {lv:3, band:'High heat stress', cls:'p-bad', text:'Hourly rest of at least 15 minutes for heavy physical work; drink water; rest under shade.'};
+  if (w >= 32) return {lv:2, band:'Moderate heat stress', cls:'p-seq', text:'Hourly rest of at least 10 minutes for heavy physical work; drink water; rest under shade.'};
+  if (w >= 31) return {lv:1, band:'Moderate heat stress', cls:'p-seq', text:'Buddy system: watch each other for signs of heat illness; rest under shade.'};
+  return {lv:0, band:'Low heat stress', cls:'p-ok', text:'Adequate rest under shade for recovery; drink water regularly.'};
+}
+function alerts(){
+  const a = [];
+  if (!safetyDone() && !locked()) a.push(['warn', 'Pre-task safety check not done: tools locked']);
+  if (S.tool && TS(S.tool).quar) a.push(['bad', `${S.tool} quarantined: do not use`]);
+  const h = heat(S.wbgt); if (h.lv) a.push([h.lv >= 2 ? 'bad' : 'warn', `WBGT ${f1(S.wbgt)} °C: ${h.lv >= 3 ? '15 min rest every hour' : h.lv === 2 ? '10 min rest every hour' : 'buddy system'}`]);
+  if (S.toolState === 'connected' && S.tele.batt < 20) a.push(['warn', `Wrench battery ${Math.round(S.tele.batt)}%`]);
+  const bad = S.bolts.filter(b => b.status === 'bad').length; if (bad) a.push(['bad', `${bad} bolt${bad > 1 ? 's' : ''} out of tolerance`]);
+  const sus = S.bolts.filter(b => b.status === 'sus').length; if (sus) a.push(['sus', `${sus} suspect bolt${sus > 1 ? 's' : ''}: tool failed its check`]);
+  return a;
+}
+function recurring(){
+  const c = {};
+  TWIN.forEach(v => Object.keys(v.issues).forEach(n => c[n] = (c[n] || 0) + 1));
+  S.bolts.forEach(b => { if (['bad', 'seq', 'rej'].includes(b.status)) c[b.n] = (c[b.n] || 0) + 1; });
+  return Object.keys(c).filter(n => c[n] >= 2).map(Number);
+}
+
+function quarantine(id, reason){
+  const s = TS(id); s.quar = {reason, t:Date.now()}; s.events.unshift({t:Date.now(), text:reason});
+  log(`${id} quarantined: ${reason}`); toast(`${id} quarantined: do not use`, 'bad');
+  if (S.tool === id && (S.toolState === 'connected' || S.toolState === 'connecting')) disconnect(true);
+}
+function checkOut(id){ if (!S.out[id] || S.out[id].ret) S.out[id] = {t:Date.now(), ret:null}; }
 
 function render(){
-  const done = S.bolts.filter(b => b.status === 'ok').length, nx = nextExpected();
-  const gs = rec ? (S.gestures ? 'acc' : '') : '';
+  const done = S.bolts.filter(b => b.status === 'ok').length, ph = phase();
+  const phText = {work:'Work in progress', await:'Awaiting inspection', inspect:'Inspection', closed:'Task closed'}[ph];
   $('chips').innerHTML = `<span class="chip ${cam.stream ? 'on' : ''}"><i></i>Camera ${cam.stream ? 'on' : 'off'}</span>
-    <span class="chip ${gs}"><i></i>Gestures ${S.gestures ? 'on' : 'off'}</span>
-    <span class="chip ${S.toolState === 'connected' ? 'on' : S.tool ? 'warn' : ''}"><i></i>${S.toolState === 'connected' ? S.tool.id + ' connected' : S.tool ? S.tool.id + ' not connected' : 'No tool'}</span>
-    <span class="chip ${S.signed ? 'on' : ''}"><i></i>${done}/12 in spec</span>`;
+    <span class="chip ${S.gestures ? 'acc' : ''}"><i></i>Gestures ${S.gestures ? 'on' : 'off'}</span>
+    <span class="chip ${S.toolState === 'connected' ? 'on' : S.tool ? 'warn' : ''}"><i></i>${S.toolState === 'connected' ? S.tool + ' connected' : S.tool ? S.tool + ' not connected' : 'No wrench'}</span>
+    <span class="chip ${ph === 'closed' ? 'on' : ph === 'work' ? '' : 'sel'}"><i></i>${phText} · ${done}/12</span>`;
+  const conf = S.insp ? S.insp.confirmed : {}, rec = recurring(), last = TWIN[0];
+  $('vp').classList.toggle('twin', S.twin);
+  $('twinBtn').classList.toggle('on', S.twin); $('twinBtn').setAttribute('aria-pressed', S.twin);
   $('ov').querySelectorAll('.bolt').forEach(g => {
-    const b = bolt(+g.dataset.n);
-    g.setAttribute('class', `bolt s-${b.status}${S.active === b.n ? ' active' : ''}`);
-    g.querySelector('.mkt').textContent = b.status === 'ok' ? '✓' : b.status === 'bad' ? '✕' : b.status === 'seq' ? '!' : '';
+    const b = bolt(+g.dataset.n), c = conf[b.n] && b.status === 'ok';
+    const prev = last.r[b.n - 1], val = b.reading != null ? b.reading : prev, tgt = b.reading != null ? b.target : TASK.target + last.run[b.n - 1], dev = Math.abs(val - tgt) / TASK.tol;
+    g.setAttribute('class', `bolt s-${b.status}${S.active === b.n ? ' active' : ''}${c ? ' conf' : ''} ${dev <= .5 ? 'dev0' : dev <= 1 ? 'dev1' : 'dev2'}${rec.includes(b.n) ? ' rec' : ''}`);
+    g.querySelector('.mkt').textContent = c ? 'I' : {ok:'✓', bad:'✕', seq:'!', sus:'?', rej:'✕'}[b.status] || '';
+    g.querySelector('.tv').textContent = b.reading != null ? f1(b.reading) : `last ${f1(prev)}`;
+    g.querySelector('.td').textContent = b.reading != null ? `prev ${f1(prev)}` : fmtDate(last.date);
   });
-  renderTool(); renderBolt(nx); renderList(done); renderFinish(); renderPhotos();
-  $('log').innerHTML = S.log.slice(0, 30).map(l => `<li><time>${hhmm(l.t)}</time>${esc(l.text)}</li>`).join('') || '<li class="small">Nothing yet.</li>';
-  hud();
-  save();
+  $('alerts').innerHTML = alerts().slice(0, 4).map(([k, t]) => `<div class="al ${k}">${esc(t)}</div>`).join('');
+  renderWO(); renderTool(); renderImpact(); renderBolt(); renderList(done); renderTwin(); renderFinish(); renderData(); renderPhotos(); updateLive();
+  $('log').innerHTML = S.log.slice(0, 40).map(l => `<li><time>${hhmm(l.t)}</time>${esc(l.text)}</li>`).join('') || '<li class="small">Nothing yet.</li>';
+  hud(); save();
+}
+
+function renderWO(){
+  const c = $('woCard'), sd = safetyDone(), lk = locked(), rem = reminders();
+  c.innerHTML = `<h2>Work order <span>${WO.no} (demo)</span></h2>
+    <ul class="facts"><li>${TASK.title} · ${TASK.ac} · planned ${fmtDate(WO.date)}</li><li>Needs a torque wrench covering ${f1(TASK.target - TASK.tol)}–${f1(TASK.target + TASK.tol + 5)} ${U}, 12 self-locking anchor nuts, a crowfoot if access needs it</li></ul>
+    <h3>Pre-task safety check ${sd ? '<span class="pill p-ok">Done</span>' : '<span class="pill p-seq">Tools locked until done</span>'}</h3>
+    ${SAFETY.map(([k, l]) => `<label class="ck"><input type="checkbox" data-sf="${k}" ${S.safety[k] ? 'checked' : ''} ${lk ? 'disabled' : ''}> ${esc(l)}</label>`).join('')}
+    <div class="sub"><h3>Error-proofing</h3>
+      <label class="ck"><input type="checkbox" id="lockCk" ${S.lockOrder ? 'checked' : ''} ${lk ? 'disabled' : ''}> Lock the bolt order: readings on the wrong bolt are rejected</label>
+      <p class="small" style="margin:0">${S.toolState === 'connected' && S.active ? `Preset sent to ${S.tool}: bolt ${S.active}, ${TGT} ${U} plus measured running torque${S.adapter && S.angle === 'inline' ? `, corrected for ${S.adapter}` : ''}.` : 'The target is sent to the wrench automatically once it connects.'}</p>
+      ${rem.length ? `<ul class="items">${rem.map(r => `<li><span class="rm ${r.k}">${r.k === 'ok' ? '✓' : r.k === 'warn' ? '!' : '✕'}</span><span style="flex:1">${esc(r.text)}</span></li>`).join('')}</ul>` : '<p class="small">Calibration and cycle reminders appear once a wrench is scanned.</p>'}</div>`;
+  c.querySelectorAll('[data-sf]').forEach(x => x.onchange = () => { S.safety[x.dataset.sf] = x.checked; if (safetyDone()) { log('Pre-task safety check complete: tools unlocked'); toast('Safety check done: tools unlocked', 'ok'); } render(); });
+  $('lockCk').onchange = e => { S.lockOrder = e.target.checked; log(`Bolt order lock ${S.lockOrder ? 'on' : 'off'}`); render(); };
 }
 
 function renderTool(){
-  const t = S.tool, c = $('toolCard');
-  const modeSeg = `<div class="seg" role="group" aria-label="Wrench mode"><button data-mode="sim" aria-pressed="${S.mode === 'sim'}">Simulated</button><button data-mode="ble" aria-pressed="${S.mode === 'ble'}">Bluetooth</button></div>`;
-  let html = `<h2>Tool <span>${S.toolState === 'connected' ? (S.mode === 'ble' ? 'Bluetooth' : 'simulated wrench') : 'scan the sticker on the wrench'}</span></h2>`;
-  if (!t) {
-    html += `<p class="muted" style="margin:0 0 10px">Scan the QR sticker (text <code>TT:TW-0042</code>) with the camera or from a photo.</p>
+  const c = $('toolCard'), id = S.tool;
+  let h = `<h2>Tools <span>${S.toolState === 'connected' ? (S.mode === 'ble' ? 'Bluetooth wrench' : 'simulated wrench') : 'scan the sticker on each tool'}</span></h2>`;
+  if (!id) {
+    h += `<p class="muted" style="margin:0 0 10px">Scan the QR sticker on the torque wrench (text like <code>TT:TW-0042</code>) with the camera or from a photo.</p>
       <div class="row"><button class="btn pri" id="scanCamBtn">Scan with camera</button><button class="btn" id="scanPhotoBtn">Scan from photo</button></div>
-      <div class="demo"><span class="small" style="align-self:center">No sticker? Try:</span><button class="btn" data-demo="TW-0042">TW-0042</button><button class="btn" data-demo="TW-0043">TW-0043</button><button class="btn" data-demo="TW-0050">TW-0050</button></div>`;
+      <div class="demo"><span class="small">No sticker? Try:</span>${['TW-0042','TW-0044','TW-0043','TW-0061','TW-0050'].map(x => `<button class="btn sm" data-demo="${x}">${x}</button>`).join('')}</div>`;
   } else {
-    const k = toolChecks(t);
-    html += `<dl><dt>Tool</dt><dd><b>${t.id}</b> · ${esc(t.type)}</dd><dt>Range</dt><dd>${t.min}–${t.max} ${SPEC.unit}</dd><dt>Calibration due</dt><dd>${fmtDate(t.cal)}</dd></dl>
-      <div class="check ${k.calOk ? 'y' : 'n'}"><b>${k.calOk ? '✓' : '✕'}</b>${k.calOk ? 'Calibration in date' : 'Calibration overdue: do not use, return to tool store'}</div>
-      <div class="check ${k.rangeOk ? 'y' : 'n'}"><b>${k.rangeOk ? '✓' : '✕'}</b>${k.rangeOk ? `Range covers ${TGT} ± ${TOL} ${SPEC.unit}` : `Range does not cover ${TGT} ${SPEC.unit}: wrong wrench for this task`}</div>
+    const t = TOOLS[id], s = TS(id), k = checks(id), left = t.limit - s.cycles, pct = Math.min(100, s.cycles / t.limit * 100);
+    const jobs = (HISTORY[id] || []).filter(j => j.date >= t.calDone);
+    const here = S.bolts.filter(b => b.history.some(x => x.tool === id)).length;
+    h += `<dl><dt>Wrench</dt><dd><b>${id}</b> · ${esc(t.type)}</dd><dt>Range</dt><dd>${t.min}–${t.max} ${U} · lever length ${t.L} mm</dd><dt>Calibrated</dt><dd>${fmtDate(t.calDone)} · due ${fmtDate(t.calDue)}</dd></dl>
+      <div class="small">Load cycles since calibration: <b>${s.cycles.toLocaleString()}</b> of ${t.limit.toLocaleString()}${left > 0 ? ` · ${left.toLocaleString()} left` : ''}${s.drops || s.overloads ? ` · drops ${s.drops} · overloads ${s.overloads}` : ''}</div>
+      <div class="meter ${pct >= 100 ? 'bad' : pct >= 90 ? 'warn' : ''}"><i style="width:${pct}%"></i></div>
+      <div class="check ${k.cal ? 'y' : 'n'}"><b>${k.cal ? '✓' : '✕'}</b>${k.cal ? 'Calibration in date' : 'Calibration overdue: return to tool store'}</div>
+      <div class="check ${k.cyc ? 'y' : 'n'}"><b>${k.cyc ? '✓' : '✕'}</b>${k.cyc ? 'Under the cycle limit' : `Cycle limit reached (${t.limit.toLocaleString()}): send for calibration`}</div>
+      <div class="check ${k.range ? 'y' : 'n'}"><b>${k.range ? '✓' : '✕'}</b>${k.range ? 'Range covers this task' : `Range does not cover ${TGT} ${U}: wrong wrench`}</div>
+      <div class="check ${k.health ? 'y' : 'n'}"><b>${k.health ? '✓' : '✕'}</b>${k.health ? 'No drops or overloads since last check' : esc(s.quar.reason)}</div>
       <div class="row" style="margin-top:10px">`;
-    if (S.toolState === 'connected') html += `<span class="pill p-ok">Connected</span><button class="btn" id="discBtn">Disconnect</button>`;
-    else if (S.toolState === 'connecting') html += `<span class="pill p-open">Connecting…</span>`;
-    else html += `<button class="btn pri" id="connBtn" ${k.ok ? '' : 'disabled'}>Connect ${t.id}</button>`;
-    html += `<button class="btn" id="changeBtn">Change tool</button></div>`;
-    if (S.toolState !== 'connected') html += `<div class="row" style="margin-top:10px"><span class="small">Wrench mode</span>${modeSeg}</div>`;
+    if (S.toolState === 'connected') h += `<span class="pill p-ok">Connected</span><button class="btn" id="discBtn">Disconnect</button>`;
+    else if (S.toolState === 'connecting') h += `<span class="pill p-open">Connecting…</span>`;
+    else h += `<button class="btn pri" id="connBtn" ${k.ok && !locked() && safetyDone() ? '' : 'disabled'}>Connect ${id}</button>`;
+    h += `<button class="btn" id="changeBtn">Change wrench</button></div>`;
+    if (S.toolState !== 'connected' && k.ok && !safetyDone()) h += `<p class="small" style="margin:6px 0 0">Finish the pre-task safety check to unlock tools.</p>`;
+    if (s.quar) h += `<div class="msg bad"><b>Quarantined.</b> Record the bench check result:<div class="row" style="margin-top:8px"><button class="btn sm" id="passBtn">Passed</button><button class="btn sm danger" id="failBtn">Failed: out of tolerance</button></div></div>`;
+    h += `<div class="row" style="margin-top:10px"><span class="small">Simulate sensor event:</span><button class="btn sm" id="dropBtn">Drop</button><button class="btn sm" id="overBtn" ${S.toolState === 'connected' ? '' : 'disabled'}>Overload</button></div>`;
+    if (S.toolState !== 'connected') h += `<div class="row" style="margin-top:8px"><span class="small">Wrench mode</span><div class="seg" role="group" aria-label="Wrench mode"><button data-mode="sim" aria-pressed="${S.mode === 'sim'}">Simulated</button><button data-mode="ble" aria-pressed="${S.mode === 'ble'}">Bluetooth</button></div></div>`;
+    h += `<details style="margin-top:8px"><summary>Tool history: ${jobs.length} jobs since calibration${here ? ` + ${here} bolts here` : ''}</summary>
+      ${s.events.length ? `<ul class="jobs">${s.events.slice(0, 6).map(e => `<li>${hhmm(e.t)} · ${esc(e.text)}</li>`).join('')}</ul>` : ''}
+      <ul class="jobs">${jobs.map(j => `<li>${fmtDate(j.date)} · ${j.ac} · ${esc(j.task)} · ${j.bolts} bolts · ${j.tech}</li>`).join('') || '<li>No earlier jobs</li>'}</ul><p class="small">Demo data.</p></details>`;
   }
-  c.innerHTML = html;
+  h += `<div class="sub"><h3>Crowfoot adapter</h3>`;
+  if (S.adapter) {
+    const a = TOOLS[S.adapter], t = id ? TOOLS[id] : null;
+    h += `<div class="row"><span><b>${a.id}</b> · ${esc(a.type)} · E ${a.E} mm</span><button class="btn sm" id="adRemove">Remove</button></div>
+      <div class="row" style="margin-top:8px"><div class="seg" role="group" aria-label="Crowfoot angle"><button data-angle="inline" aria-pressed="${S.angle === 'inline'}">In line</button><button data-angle="90" aria-pressed="${S.angle === '90'}">At 90°</button></div></div>
+      <p class="small" style="margin:6px 0 0">${S.angle === '90' ? 'At 90° the lever length does not change: no correction.' : t ? `Wrench setting = target × ${t.L} / (${t.L} + ${a.E}) = target × ${factor().toFixed(3)}` : 'Scan a wrench to calculate the setting.'}</p>`;
+  } else h += `<p class="small" style="margin:0">None fitted. Scan the adapter's sticker if you use one.</p><div class="demo">${['CF-0012','CF-0025'].map(x => `<button class="btn sm" data-demo="${x}">${x}</button>`).join('')}</div>`;
+  h += `</div>`;
+  c.innerHTML = h;
   c.querySelectorAll('[data-demo]').forEach(b => b.onclick = () => handleCode('TT:' + b.dataset.demo, 'demo'));
   c.querySelectorAll('[data-mode]').forEach(b => b.onclick = () => { S.mode = b.dataset.mode; render(); });
-  const on = (id, f) => { const el = $(id); if (el) el.onclick = f; };
+  c.querySelectorAll('[data-angle]').forEach(b => b.onclick = () => { S.angle = b.dataset.angle; log(`Crowfoot set ${S.angle === '90' ? 'at 90°' : 'in line'}`); render(); });
+  const on = (x, f) => { const el = $(x); if (el) el.onclick = f; };
   on('scanCamBtn', scanWithCamera); on('scanPhotoBtn', () => $('qrFile').click());
-  on('connBtn', connect); on('discBtn', disconnect);
+  on('connBtn', connect); on('discBtn', () => disconnect());
   on('changeBtn', () => { disconnect(true); S.tool = null; S.toolState = 'none'; render(); });
+  on('dropBtn', () => toolEvent('drop')); on('overBtn', () => toolEvent('over'));
+  on('passBtn', () => benchCheck(S.tool, true)); on('failBtn', () => benchCheck(S.tool, false));
+  on('adRemove', () => { log(`Crowfoot ${S.adapter} removed`); S.adapter = null; render(); });
 }
 
-function renderBolt(nx){
-  const b = S.active ? bolt(S.active) : null, c = $('boltCard');
-  if (!b) { c.innerHTML = `<h2>Bolts</h2><p class="msg ok">All 12 bolts torqued in spec. Finish the task below.</p>`; return; }
-  const st = {open:['p-open','Not torqued'], ok:['p-ok','In spec'], bad:['p-bad','Out of tolerance'], seq:['p-seq','Out of sequence']}[b.status];
-  const isNext = b.n === nx;
-  const ready = S.toolState === 'connected';
+function renderImpact(){
+  const c = $('impactCard'), m = S.impact;
+  if (!m) { c.classList.add('hidden'); return; }
+  c.classList.remove('hidden');
+  const total = m.jobs.reduce((a, j) => a + j.bolts, 0);
+  c.innerHTML = `<h2>Reverse traceability <span>${m.tool} failed its check</span></h2>
+    <p class="msg sus" style="margin-top:0">${m.tool} was out of tolerance when checked. Everything it torqued since its last good calibration (${fmtDate(m.since)}) is suspect: <b>${m.jobs.length} earlier jobs, ${total} bolts</b>${m.bolts.length ? `, plus <b>bolts ${listNums(m.bolts)}</b> on this panel` : ''}.</p>
+    <ul class="jobs">${m.jobs.map(j => `<li>${fmtDate(j.date)} · ${j.ac} · ${esc(j.task)} · ${j.bolts} bolts · ${j.tech}</li>`).join('')}${m.bolts.length ? `<li><b>Today · ${TASK.ac} · ${TASK.title} · bolts ${listNums(m.bolts)}: re-torque with a serviceable wrench</b></li>` : ''}</ul>
+    <div class="row" style="margin-top:10px"><button class="btn" id="impCopy">Copy list</button><button class="btn" id="impHide">Dismiss</button></div><p class="small">Demo data.</p>`;
+  $('impCopy').onclick = () => copyText(`Suspect work, ${m.tool} (since ${m.since}):\n` + m.jobs.map(j => `${j.date} ${j.ac} ${j.task}, ${j.bolts} bolts, ${j.tech}`).join('\n') + (m.bolts.length ? `\nToday ${TASK.ac} ${TASK.title}: bolts ${listNums(m.bolts)}` : ''), 'List copied');
+  $('impHide').onclick = () => { S.impact = null; render(); };
+}
+
+function renderBolt(){
+  const c = $('boltCard'), b = S.active ? bolt(S.active) : null;
+  if (phase() === 'inspect') return renderInspect(c, b);
+  if (!b) { c.innerHTML = `<h2>Bolts</h2><p class="msg ok">All 12 bolts in spec. Finish the task below.</p>`; return; }
+  const nx = nextExpected(), st = STAT[b.status], isNext = b.n === nx, ready = S.toolState === 'connected' && !locked();
+  const last = b.history[b.history.length - 1];
   let note = '';
-  if (b.status === 'bad') note = `<p class="msg bad">${b.kind === 'over' ? `Over-torqued at ${b.reading.toFixed(1)} ${SPEC.unit}. Follow the task card's over-torque instructions before torquing again.` : `Under-torqued at ${b.reading.toFixed(1)} ${SPEC.unit}. Torque again to ${TGT} ${SPEC.unit}.`}</p>`;
+  if (b.status === 'bad') note = b.kind === 'lock' ? `<p class="msg bad">Running torque ${f1(b.run)} ${U} is below the minimum ${f1(TASK.minRun)} ${U}: the locking feature is worn. ${b.nutNew ? `New nut ${b.nutNew} logged: torque again.` : 'Replace the nut, scan its lot code, then torque again.'}</p>${b.nutNew ? '' : '<div class="row" style="margin-top:8px"><button class="btn sm" id="nutBtn">Log new nut (demo lot LT-2611)</button></div>'}`
+    : b.kind === 'over' ? `<p class="msg bad">Over-torqued at ${f1(b.reading)} ${U} (target ${f1(b.target)}). Follow the task card's over-torque instructions before torquing again.</p>`
+    : `<p class="msg bad">Under-torqued at ${f1(b.reading)} ${U} (target ${f1(b.target)}). Torque again.</p>`;
   else if (b.status === 'seq') note = `<p class="msg warn">Torqued before an earlier bolt. Re-check this bolt once the earlier ones are done.</p>`;
-  else if (!isNext && b.status === 'open' && nx) note = `<p class="msg warn">Bolt ${nx} comes first in the order.</p>`;
-  c.innerHTML = `<h2>Bolt ${b.n} <span>${isNext ? '<span class="pill p-next">Next in order</span>' : ''} <span class="pill ${st[0]}">${st[1]}</span></span></h2>
-    <div class="bolthead"><div><div class="big">${b.reading != null ? b.reading.toFixed(1) : '–'}<span style="font-size:20px"> ${SPEC.unit}</span></div>
-    <div class="small">${b.t ? 'Last reading ' + hhmm(b.t) + (b.history.length > 1 ? ` · ${b.history.length} readings` : '') : `Target ${TGT} ± ${TOL}`}</div></div>
-    <div class="row"><button class="btn" id="prevBtn" aria-label="Previous bolt">◀</button><button class="btn" id="nextBtn" aria-label="Next bolt">▶</button></div></div>
-    <div class="row"><button class="btn pri" id="pullBtn" ${ready ? '' : 'disabled'}>Simulate pull</button>
-    <div class="seg" role="group" aria-label="Simulated result"><button data-out="in" aria-pressed="${S.outcome === 'in'}">In spec</button><button data-out="under" aria-pressed="${S.outcome === 'under'}">Under</button><button data-out="over" aria-pressed="${S.outcome === 'over'}">Over</button></div></div>
-    ${ready ? '' : '<p class="small" style="margin:8px 0 0">Connect a tool first: readings only count from a checked, connected wrench.</p>'}${note}`;
+  else if (b.status === 'sus' || b.status === 'rej') note = `<p class="msg ${b.status === 'sus' ? 'sus' : 'bad'}">${esc(b.note)}</p>`;
+  else if (!isNext && b.status === 'open' && nx) note = `<p class="msg warn">Bolt ${nx} comes first in the order${S.lockOrder ? ': the wrench will reject this bolt' : ''}.</p>`;
+  const tgtTxt = b.target != null ? `${f1(b.target)} ± ${TOL}` : `${TGT} + running torque`;
+  const setTxt = S.adapter && S.tool ? (S.angle === '90' ? `Crowfoot at 90°: set wrench to the final target` : b.target != null ? `Crowfoot in line: wrench setting ${f1(setting(b.target))} ${U} for a ${f1(b.target)} target` : `Crowfoot in line: setting = final target × ${factor().toFixed(3)}`) : '';
+  const stripe = b.status === 'ok' ? `<div class="sub"><h3>Torque stripe</h3>${b.stripe ? `<div class="stripe">${b.stripe.img ? `<img class="thumb" src="${b.stripe.img}" alt="Torque stripe photo, bolt ${b.n}">` : ''}<div class="small"><b style="color:var(--${b.stripe.ok ? 'ok' : 'bad'})">${b.stripe.ok ? 'Stripe colour found' : 'No stripe seen'}</b> · ${b.stripe.pct.toFixed(1)}% of centre<br>${b.stripe.color} · ${hhmm(b.stripe.t)}</div></div>` : '<p class="small" style="margin:0">Apply the stripe, then photograph it.</p>'}
+    <div class="row" style="margin-top:8px"><button class="btn" id="stripeBtn">${b.stripe ? 'Check again' : 'Check stripe'}</button><select id="stripeCol" aria-label="Stripe colour">${Object.keys(STRIPE).map(k => `<option ${k === S.stripeColor ? 'selected' : ''}>${k}</option>`).join('')}</select></div></div>` : '';
+  c.innerHTML = `<h2>Bolt ${b.n} <span>${isNext ? '<span class="pill p-next">Next in order</span> ' : ''}<span class="pill ${st[0]}">${st[1]}</span></span></h2>
+    <div class="bolthead"><div><div class="big">${b.reading != null ? f1(b.reading) : '–'}<span style="font-size:20px"> ${U}</span></div>
+      <div class="small">${b.t ? `Last reading ${hhmm(b.t)}${b.history.length > 1 ? ` · ${b.history.length} readings` : ''}${last && last.tool ? ` · ${last.tool}` : ''}` : 'Applied torque at the fastener'}</div></div>
+      <div class="row"><button class="btn" id="prevBtn" aria-label="Previous bolt">◀</button><button class="btn" id="nextBtn" aria-label="Next bolt">▶</button></div></div>
+    <ul class="facts"><li>Running torque: <b>${b.run != null ? f1(b.run) + ' ' + U : 'measured during rundown'}</b> · minimum ${f1(TASK.minRun)}</li>
+      <li>Final target: <b>${tgtTxt} ${U}</b>${b.run != null ? ` (${TGT} + ${f1(b.run)})` : ''}</li>${setTxt ? `<li>${setTxt}</li>` : ''}</ul>
+    <div class="row"><button class="btn pri" id="pullBtn" ${ready && !pulling ? '' : 'disabled'}>Simulate pull</button>
+      <div class="seg" role="group" aria-label="Simulated result">${[['in','In spec'],['under','Under'],['over','Over'],['worn','Worn nut']].map(([k, l]) => `<button data-out="${k}" aria-pressed="${S.outcome === k}">${l}</button>`).join('')}</div></div>
+    ${ready ? '' : `<p class="small" style="margin:8px 0 0">${locked() ? 'Readings are locked after sign-off.' : 'Connect a checked wrench first: readings only count from a serviceable, connected tool.'}</p>`}${note}${stripe}`;
   $('pullBtn').onclick = simPull; $('prevBtn').onclick = () => step(-1); $('nextBtn').onclick = () => step(1);
   c.querySelectorAll('[data-out]').forEach(x => x.onclick = () => { S.outcome = x.dataset.out; render(); });
+  if ($('nutBtn')) $('nutBtn').onclick = () => logPart('LT-2611', 'button');
+  if ($('stripeBtn')) { $('stripeBtn').onclick = stripeCheck; $('stripeCol').onchange = e => { S.stripeColor = e.target.value; save(); }; }
+}
+
+function renderInspect(c, b){
+  if (!b) { c.innerHTML = `<h2>Inspection</h2><p class="msg ok">All bolts confirmed. Complete the inspection below.</p>`; return; }
+  const conf = S.insp.confirmed[b.n], h = b.history[b.history.length - 1] || {}, t = h.tool && TOOLS[h.tool];
+  c.innerHTML = `<h2>Inspect bolt ${b.n} <span><span class="pill ${conf ? 'p-conf' : 'p-open'}">${conf ? 'Confirmed' : 'To inspect'}</span></span></h2>
+    <div class="bolthead"><div><div class="big">${b.reading != null ? f1(b.reading) : '–'}<span style="font-size:20px"> ${U}</span></div><div class="small">Target ${b.target != null ? f1(b.target) : TGT} ± ${TOL}</div></div>
+    <div class="row"><button class="btn" id="prevBtn" aria-label="Previous bolt">◀</button><button class="btn" id="nextBtn" aria-label="Next bolt">▶</button></div></div>
+    <ul class="facts"><li>Running torque <b>${b.run != null ? f1(b.run) : '—'} ${U}</b> (minimum ${f1(TASK.minRun)})${b.nutNew ? ` · new nut ${b.nutNew}` : ''}</li>
+      <li>Tool <b>${h.tool || '—'}</b>${t ? ` · calibration due ${fmtDate(t.calDue)}` : ''}${h.adapter ? ` · crowfoot ${h.adapter}` : ''}</li>
+      <li>Torqued by <b>${esc(h.tech || '—')}</b> at ${b.t ? hhmm(b.t) : '—'} · ${b.history.length} reading${b.history.length === 1 ? '' : 's'}</li>
+      <li>Torque stripe: <b>${b.stripe ? (b.stripe.ok ? 'photo, colour found' : 'photo, no stripe seen') : 'no photo'}</b></li></ul>
+    ${b.stripe && b.stripe.img ? `<img class="thumb" src="${b.stripe.img}" alt="Torque stripe photo, bolt ${b.n}" style="margin-bottom:10px">` : ''}
+    <div class="row"><button class="btn pri" id="confBtn" ${conf ? 'disabled' : ''}>Confirm bolt (OK sign)</button></div>
+    <div class="row" style="margin-top:8px"><select id="rejWhy" aria-label="Reject reason">${REJECT.map(r => `<option>${r}</option>`).join('')}</select><button class="btn danger" id="rejBtn">Reject</button></div>`;
+  $('prevBtn').onclick = () => step(-1); $('nextBtn').onclick = () => step(1);
+  $('confBtn').onclick = () => confirmBolt(b.n, 'tap');
+  $('rejBtn').onclick = () => rejectBolt(b.n, $('rejWhy').value);
 }
 
 function renderList(done){
-  $('blSum').textContent = `${done} of 12 in spec`;
-  $('bl').innerHTML = S.bolts.map(b => `<button class="tile ${b.status !== 'open' ? b.status : ''} ${S.active === b.n ? 'act' : ''}" data-n="${b.n}" aria-label="Bolt ${b.n}, ${b.status}"><b>${b.n}</b><small>${b.reading != null ? b.reading.toFixed(1) : '—'}</small></button>`).join('');
+  const conf = S.insp ? S.insp.confirmed : {};
+  $('blSum').textContent = phase() === 'inspect' ? `${Object.keys(conf).length} of 12 confirmed` : `${done} of 12 in spec`;
+  $('bl').innerHTML = S.bolts.map(b => `<button class="tile ${b.status !== 'open' ? b.status : ''} ${conf[b.n] ? 'conf' : ''} ${S.active === b.n ? 'act' : ''}" data-n="${b.n}" aria-label="Bolt ${b.n}, ${STAT[b.status][1]}"><b>${b.n}</b><small>${b.reading != null ? f1(b.reading) : '—'}</small><small>${conf[b.n] ? 'inspected' : b.stripe && b.stripe.ok ? 'stripe ✓' : '&nbsp;'}</small></button>`).join('');
   $('bl').querySelectorAll('.tile').forEach(t => t.onclick = () => select(+t.dataset.n, 'tap'));
 }
 
-function renderFinish(){
-  const c = $('finishCard');
-  let html = `<h2>Finish and sign off <span>thumbs up, hold</span></h2>`;
-  if (S.signed) html += `<p class="msg ok" style="margin-top:0">Signed off by <b>${esc(S.signed.tech)}</b> at ${hhmm(S.signed.t)}. Badge scan simulated; a real system uses the staff ID system.</p>`;
-  else if (S.finish && S.finish.ok) html += `<p class="msg ok" style="margin-top:0">All 12 bolts in spec. Scan your staff badge to sign off.</p>
-    <div class="row" style="margin-top:10px"><label class="small" for="techId">Staff ID</label><input type="text" id="techId" value="${esc(S.tech)}"><button class="btn pri" id="badgeBtn">Simulate badge scan</button></div>`;
-  else {
-    html += `<div class="row"><button class="btn pri" id="finBtn">Finish task</button></div>`;
-    if (S.finish) html += `<p class="msg bad">${esc(S.finish.text)}</p>`;
-  }
-  c.innerHTML = html;
-  if ($('finBtn')) $('finBtn').onclick = () => finish('tap');
-  if ($('badgeBtn')) $('badgeBtn').onclick = () => { S.tech = ($('techId').value || 'T-0000').trim(); S.signed = {tech:S.tech, t:Date.now()}; log(`Task signed off by ${S.tech} (badge scan simulated)`); toast('Task signed off', 'ok'); render(); };
+function renderTwin(){
+  const c = $('twinCard'), rec = recurring();
+  const avg = a => a.reduce((x, y) => x + y, 0) / a.length;
+  const trend = TWIN.slice().reverse().map(v => ({d:v.date, a:avg(v.run)}));
+  const runs = S.bolts.filter(b => b.run != null).map(b => b.run);
+  if (runs.length >= 3) trend.push({d:'today', a:avg(runs)});
+  const falling = trend.length > 1 && trend[trend.length - 1].a < trend[0].a - .3;
+  c.innerHTML = `<h2>Digital twin <span>panel 571AB on ${TASK.ac}</span></h2>
+    <p class="small" style="margin:0 0 6px">Every visit's readings stay with this panel. Twin view paints them onto the bolts: green near target, amber drifting, red out of tolerance; purple dashes mark repeat problems.</p>
+    <ul class="jobs">${TWIN.map(v => { const iss = Object.entries(v.issues); return `<li>${fmtDate(v.date)} · ${v.check} · ${12 - iss.length}/12 in spec first time${iss.length ? ' · ' + iss.map(([n, t]) => `bolt ${n} ${t}`).join('; ') : ''}</li>`; }).join('')}</ul>
+    ${rec.length ? `<p class="msg sus">Repeat problem: bolt${rec.length > 1 ? 's' : ''} ${listNums(rec)} failed in 2 or more visits. Check the anchor nut and thread condition.</p>` : ''}
+    <p class="msg ${falling ? 'warn' : 'info'}">Average running torque: ${trend.map(x => `${f1(x.a)}${x.d === 'today' ? ' (today)' : ''}`).join(' → ')} ${U}.${falling ? ' Falling: the self-locking nuts are wearing; plan replacements before the next check.' : ''}</p>
+    <div class="row" style="margin-top:8px"><button class="btn" id="twinBtn2">${S.twin ? 'Hide twin view' : 'Show twin view on panel'}</button></div><p class="small">Demo history.</p>`;
+  $('twinBtn2').onclick = toggleTwin;
 }
+function toggleTwin(){ S.twin = !S.twin; log(`Twin view ${S.twin ? 'on' : 'off'}`); render(); }
+
+function renderFinish(){
+  const c = $('finishCard'), ph = phase();
+  let h = '';
+  if (ph === 'work') {
+    h = `<h2>Finish, close out and sign off <span>thumbs up, hold</span></h2><div class="row"><button class="btn pri" id="finBtn">Finish task</button></div>`;
+    if (S.finish && !S.finish.ok) h += `<p class="msg bad">${esc(S.finish.text)}</p>`;
+    if (S.finish && S.finish.ok) {
+      const out = Object.entries(S.out).filter(([, o]) => !o.ret), back = Object.entries(S.out).filter(([, o]) => o.ret);
+      const ready = !out.length && S.areaClear;
+      h += `<p class="msg ok">All 12 bolts in spec.</p><div class="sub"><h3>Close-out</h3>
+        ${out.length ? `<ul class="items">${out.map(([id]) => `<li><span><b>${id}</b> still checked out</span><button class="btn sm" data-ret="${id}">Returned</button></li>`).join('')}</ul>` : '<p class="small" style="margin:0">All tools returned to the store.</p>'}
+        ${back.length ? `<p class="small">Returned: ${back.map(([id]) => id).join(', ')}</p>` : ''}
+        <label class="ck"><input type="checkbox" id="areaCk" ${S.areaClear ? 'checked' : ''}> Work area clear of tools, parts and rags; panel refitted</label>
+        <div class="row" style="margin-top:6px"><label class="small" for="techId">Technician</label><input type="text" id="techId" value="${esc(S.tech)}"><button class="btn pri" id="signBtn" ${ready ? '' : 'disabled'}>Sign off (badge scan)</button></div>
+        ${ready ? '' : `<p class="small">${out.length ? 'Return every tool before signing.' : 'Tick the area check before signing.'}</p>`}</div>`;
+    }
+  } else if (ph === 'await') {
+    h = `<h2>Independent inspection <span>critical task (demo)</span></h2>
+      <p class="msg info" style="margin-top:0">Signed off by <b>${esc(S.signed.tech)}</b> at ${hhmm(S.signed.t)}. A different qualified person must now inspect assembly and locking.</p>
+      <div class="row"><label class="small" for="inspId">Inspector</label><input type="text" id="inspId" value="${esc(S.insp && S.insp.id || 'I-5678')}"><button class="btn pri" id="inspBtn">Start inspection</button></div>
+      ${S.insp && S.insp.msg ? `<p class="msg bad">${esc(S.insp.msg)}</p>` : ''}${rejects()}`;
+  } else if (ph === 'inspect') {
+    const n = Object.keys(S.insp.confirmed).length, k = S.insp.checks;
+    h = `<h2>Inspection by ${esc(S.insp.id)} <span>${n} of 12 bolts confirmed</span></h2>
+      <div class="meter"><i style="width:${n / 12 * 100}%"></i></div>
+      <label class="ck"><input type="checkbox" data-ck="assembly" ${k.assembly ? 'checked' : ''}> Correct assembly: right parts, fully seated</label>
+      <label class="ck"><input type="checkbox" data-ck="locking" ${k.locking ? 'checked' : ''}> Locking: self-locking nuts and torque stripes</label>
+      <label class="ck"><input type="checkbox" data-ck="operation" ${k.operation ? 'checked' : ''}> Sense of operation checked, or not applicable</label>
+      <div class="row" style="margin-top:6px"><button class="btn pri" id="inspDone">Complete inspection</button></div>${S.insp.msg ? `<p class="msg bad">${esc(S.insp.msg)}</p>` : ''}${rejects()}`;
+  } else {
+    h = `<h2>Task closed</h2><p class="msg ok" style="margin-top:0">Torqued and signed by <b>${esc(S.signed.tech)}</b> at ${hhmm(S.signed.t)}. Independently inspected by <b>${esc(S.insp.signed.id)}</b> at ${hhmm(S.insp.signed.t)}. Badge scans simulated.</p>${rejects()}`;
+  }
+  c.innerHTML = h;
+  const on = (x, f) => { const el = $(x); if (el) el.onclick = f; };
+  on('finBtn', () => finish('tap'));
+  c.querySelectorAll('[data-ret]').forEach(b => b.onclick = () => returnTool(b.dataset.ret));
+  if ($('areaCk')) $('areaCk').onchange = e => { S.areaClear = e.target.checked; render(); };
+  on('signBtn', techSign);
+  on('inspBtn', () => startInspection($('inspId').value));
+  c.querySelectorAll('[data-ck]').forEach(x => x.onchange = () => { S.insp.checks[x.dataset.ck] = x.checked; S.insp.msg = ''; render(); });
+  on('inspDone', () => completeInspection('tap'));
+}
+const rejects = () => S.insp && S.insp.rejects.length ? `<p class="small">Rejections: ${S.insp.rejects.map(r => `bolt ${r.n} (${esc(r.reason)}, ${hhmm(r.t)})`).join('; ')}</p>` : '';
+
+const readingsAll = () => S.bolts.flatMap(b => b.history.map(h => Object.assign({n:b.n}, h))).sort((a, b) => b.t - a.t);
+const RES = h => h.status === 'ok' ? 'in spec' : h.status === 'seq' ? 'out of sequence' : h.kind === 'lock' ? 'worn nut' : `${h.kind}-torqued`;
+function renderData(){
+  const all = readingsAll();
+  $('dataSum').textContent = `${all.length} reading${all.length === 1 ? '' : 's'} · ${S.parts.length} part${S.parts.length === 1 ? '' : 's'} · logged automatically`;
+  $('dataBody').innerHTML = all.slice(0, 30).map(h => `<tr><td>${hhmm(h.t)}</td><td>${h.n}</td><td class="num">${f1(h.v)}</td><td class="num">${f1(h.target)}</td><td class="num">${h.run != null ? f1(h.run) : '—'}</td><td>${h.tool}${h.adapter ? ' + ' + h.adapter : ''}</td><td>${RES(h)}</td></tr>`).join('') || '<tr><td colspan="7" class="small">Readings appear here as the wrench sends them.</td></tr>';
+  $('partsList').innerHTML = S.parts.map(p => `<li>${hhmm(p.t)} · ${esc(p.what)} ${p.lot} · bolt ${p.bolt}</li>`).join('');
+  $('csvDl').classList.toggle('hidden', FRAMED);
+}
+function csv(){
+  const rows = [['time', 'work_order', 'aircraft', 'task', 'bolt', 'applied_Nm', 'wrench_reading_Nm', 'target_Nm', 'running_Nm', 'tool', 'crowfoot', 'technician', 'result']];
+  readingsAll().reverse().forEach(h => rows.push([new Date(h.t).toISOString(), WO.no, TASK.ac, TASK.title, h.n, f1(h.v), f1(h.raw), f1(h.target), h.run != null ? f1(h.run) : '', h.tool, h.adapter || '', h.tech, RES(h)]));
+  S.parts.forEach(p => rows.push([new Date(p.t).toISOString(), WO.no, TASK.ac, TASK.title, p.bolt, '', '', '', '', '', '', S.tech, `${p.what} ${p.lot}`]));
+  return rows.map(r => r.map(x => /[",\n]/.test(String(x)) ? `"${String(x).replace(/"/g, '""')}"` : x).join(',')).join('\n');
+}
+async function copyText(txt, ok){ try { await navigator.clipboard.writeText(txt); toast(ok, 'ok'); } catch (e) { toast('Copy is not available here'); } }
 
 function renderPhotos(){
   $('phSum').textContent = S.photos.length ? `${S.photos.length} saved` : 'none yet';
   $('photos').innerHTML = S.photos.map(p => `<figure><img src="${p.src}" alt="Evidence photo for bolt ${p.bolt}"><figcaption>Bolt ${p.bolt} · ${hhmm(p.t)}</figcaption></figure>`).join('');
 }
 
-function hud(label, prog){
+function updateLive(){
+  const con = S.toolState === 'connected', s = S.tool ? TS(S.tool) : null, T = S.tele;
+  $('liveSub').textContent = con ? (S.mode === 'ble' ? 'from the Bluetooth wrench' : 'simulated wrench') : 'connect a wrench';
+  $('tiles').innerHTML = [['Battery', con ? `${Math.round(T.batt)}%` : '—'], ['Signal', con ? `${Math.round(T.rssi)} dBm` : '—'], ['Wrench temp', con ? `${f1(T.temp)} °C` : '—'], ['Cycles', s ? s.cycles.toLocaleString() : '—']].map(([l, v]) => `<div><small>${l}</small><b>${v}</b></div>`).join('');
+  const h = heat(S.wbgt);
+  $('heatPill').className = 'pill ' + h.cls; $('heatPill').textContent = `${f1(S.wbgt)} °C · ${h.band}`;
+  $('heatText').textContent = h.text;
+  document.querySelectorAll('[data-wbgt]').forEach(b => b.setAttribute('aria-pressed', +b.dataset.wbgt === S.wbgt));
+  drawCurve();
+}
+function drawCurve(){
+  const fig = $('curveFig'), cv = $('curve'), W = fig.clientWidth, H = fig.clientHeight, dpr = window.devicePixelRatio || 1;
+  if (!W || !H) return;
+  if (cv.width !== Math.round(W * dpr) || cv.height !== Math.round(H * dpr)) { cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); }
+  const x = cv.getContext('2d'); x.setTransform(dpr, 0, 0, dpr, 0, 0); x.clearRect(0, 0, W, H);
+  const cs = getComputedStyle(document.body), mute = cs.getPropertyValue('--mute').trim() || '#888', ink = cs.color;
+  const d = G.live || S.curve, L = 34, R = 10, T = 8, B = 20, pw = W - L - R, ph = H - T - B;
+  const tgt = d ? d.target : TASK.target + 2.5, peak = d && d.pts.length ? Math.max(...d.pts) : 0;
+  const ymax = Math.ceil(Math.max(tgt + TASK.tol + 3, peak + 2) / 10) * 10, Y = v => T + ph - v / ymax * ph;
+  x.font = '12px Barlow, sans-serif'; x.lineWidth = 1;
+  for (let v = 0; v <= ymax; v += 10) { x.strokeStyle = 'rgba(128,128,128,.25)'; x.beginPath(); x.moveTo(L, Y(v)); x.lineTo(W - R, Y(v)); x.stroke(); x.fillStyle = mute; x.fillText(String(v), 6, Y(v) + 4); }
+  x.fillStyle = 'rgba(45,181,116,.2)'; x.fillRect(L, Y(tgt + TASK.tol), pw, Y(tgt - TASK.tol) - Y(tgt + TASK.tol));
+  x.fillStyle = mute; x.fillText(`N·m · target ${f1(tgt)} ± ${TOL}`, L + 4, H - 5);
+  if (!d || !d.pts.length) { x.fillText('The torque curve draws live during each pull', L + 8, T + 18); return; }
+  if (d.run) { x.setLineDash([4, 4]); x.strokeStyle = mute; x.beginPath(); x.moveTo(L, Y(d.run)); x.lineTo(W - R, Y(d.run)); x.stroke(); x.setLineDash([]); x.fillStyle = mute; x.fillText(`running ${f1(d.run)}`, W - R - 74, Y(d.run) - 4); }
+  const N = Math.max(d.total || d.pts.length, 2), X = i => L + i / (N - 1) * pw;
+  x.strokeStyle = '#4aa3ff'; x.lineWidth = 2.5; x.beginPath(); d.pts.forEach((v, i) => i ? x.lineTo(X(i), Y(v)) : x.moveTo(X(i), Y(v))); x.stroke();
+  if (!G.live && d.v != null) { const i = d.pts.indexOf(peak); x.fillStyle = ink; x.beginPath(); x.arc(X(i), Y(peak), 4, 0, 7); x.fill(); x.font = '600 13px Barlow, sans-serif'; x.fillText(`${f1(d.v)} N·m`, Math.min(X(i) + 8, W - R - 60), Y(peak) - 6); }
+}
+
+function hud(label, prog, extra){
   const el = $('hud');
   if (!cam.stream) { el.innerHTML = `<b>Camera off.</b> Tap bolts, or start the camera for gestures.`; return; }
   if (recState === 'loading') { el.innerHTML = `<b>Loading gesture model…</b>`; return; }
   if (recState === 'failed') { el.innerHTML = `<b>Gestures unavailable.</b> The model could not load; tapping still works.`; return; }
   const scanning = needScan() ? ' · scanning for tool QR' : '';
-  const name = label ? (LABEL[label] || label) : 'No hand';
+  const name = extra || (label ? (LABEL[label] || label) : 'No hand');
   el.innerHTML = `<b>Gestures ${S.gestures ? 'on' : 'off'}</b>${scanning}<br>${S.gestures || label === 'Open_Palm' ? name : 'Show an open palm and hold to turn gestures on'}${prog ? `<div class="bar"><i style="width:${Math.round(prog * 100)}%"></i></div>` : ''}`;
 }
 
 function select(n, via){
-  if (S.signed) { toast('Task already signed off'); return; }
+  if (n < 1 || n > 12) return;
   S.active = n;
   if (via === 'gesture') log(`Bolt ${n} selected by pointing`);
   render();
 }
 function step(d){ const n = ((S.active || 1) - 1 + d + 12) % 12 + 1; select(n); toast(`Bolt ${n} selected`); }
 
-function onTorque(v, source){
-  if (S.toolState !== 'connected') { toast('No connected tool: reading ignored', 'warn'); return; }
-  if (S.signed) { toast('Task already signed off'); return; }
+function onTorque(applied, source, run, raw){
+  if (S.toolState !== 'connected') { toast('No connected wrench: reading ignored', 'warn'); return; }
+  if (locked()) { toast('Task signed off: readings locked'); return; }
+  const id = S.tool, t = TOOLS[id], s = TS(id);
+  if (s.quar) { toast(`${id} is quarantined: reading ignored`, 'bad'); return; }
   const n = S.active || nextExpected();
   if (!n) { toast('All bolts already in spec'); return; }
-  const b = bolt(n), val = Math.round(v * 10) / 10;
-  const inTol = Math.abs(val - SPEC.target) <= SPEC.tol + 1e-9;
+  const b = bolt(n), v = Math.round(applied * 10) / 10, rawV = Math.round((raw != null ? raw : applied * factor()) * 10) / 10;
+  const r = run != null ? Math.round(run * 10) / 10 : null, target = TASK.target + (r || 0);
   const earlier = S.bolts.filter(x => x.n < n && x.status !== 'ok').map(x => x.n);
-  b.kind = val > SPEC.target ? 'over' : 'under';
-  b.status = !inTol ? 'bad' : earlier.length ? 'seq' : 'ok';
-  b.reading = val; b.t = Date.now(); b.history.push({v:val, t:b.t, status:b.status});
+  s.cycles++; S.tele.batt = Math.max(5, S.tele.batt - .4);
+  if (S.lockOrder && earlier.length && rawV <= t.max * 1.25) {
+    log(`Locked: ${f1(v)} ${U} on bolt ${n} rejected, bolt ${earlier[0]} comes first`); toast(`Locked: bolt ${earlier[0]} comes first`, 'warn');
+    S.active = earlier[0]; render(); return;
+  }
+  let status, kind = null;
+  if (rawV > t.max * 1.25) { status = 'bad'; kind = 'over'; s.overloads++; }
+  else if (r != null && r < TASK.minRun) { status = 'bad'; kind = 'lock'; }
+  else if (Math.abs(v - target) > TASK.tol + 1e-9) { status = 'bad'; kind = v > target ? 'over' : 'under'; }
+  else status = earlier.length ? 'seq' : 'ok';
+  Object.assign(b, {status, kind, reading:v, run:r, target, tool:id, t:Date.now(), note:'', stripe:null});
+  b.history.push({v, raw:rawV, run:r, target, t:b.t, status, kind, tool:id, adapter:S.adapter && S.angle === 'inline' ? S.adapter : null, tech:S.tech});
+  if (S.insp) delete S.insp.confirmed[n];
   S.finish = null;
-  const src = source === 'wrench' ? 'wrench' : 'simulated';
-  if (b.status === 'ok') { log(`Bolt ${n}: ${val.toFixed(1)} ${SPEC.unit} in spec (${src})`); toast(`Bolt ${n}: ${val.toFixed(1)} ${SPEC.unit} ✓`, 'ok'); S.active = nextExpected(); }
-  else if (b.status === 'bad') { log(`Bolt ${n}: ${val.toFixed(1)} ${SPEC.unit} OUT OF TOLERANCE, ${b.kind} (${src})`); toast(`Bolt ${n}: ${val.toFixed(1)} ${SPEC.unit}, ${b.kind}-torqued`, 'bad'); }
-  else { log(`Bolt ${n}: ${val.toFixed(1)} ${SPEC.unit} out of sequence, bolts ${listNums(earlier)} not done (${src})`); toast(`Bolt ${n} done out of order: go back to bolt ${earlier[0]}`, 'warn'); S.active = earlier[0]; }
+  const src = source === 'wrench' ? 'wrench' : 'simulated', runTxt = r != null ? `, running ${f1(r)}` : '';
+  if (status === 'ok') { log(`Bolt ${n}: ${f1(v)} ${U}, target ${f1(target)}${runTxt} (${src}, ${id})`); toast(`Bolt ${n}: ${f1(v)} ${U} ✓${r ? ` (includes ${f1(r)} running torque)` : ''}`, 'ok'); S.active = nextExpected(); }
+  else if (kind === 'lock') { log(`Bolt ${n}: running torque ${f1(r)} below minimum ${f1(TASK.minRun)}: replace nut (${src})`); toast(`Bolt ${n}: locking feature worn, replace nut`, 'bad'); }
+  else if (status === 'bad') { log(`Bolt ${n}: ${f1(v)} ${U} OUT OF TOLERANCE, ${kind} (target ${f1(target)}, ${src})`); toast(`Bolt ${n}: ${f1(v)} ${U}, ${kind}-torqued`, 'bad'); }
+  else { log(`Bolt ${n}: ${f1(v)} ${U} out of sequence, bolts ${listNums(earlier)} not done (${src})`); toast(`Bolt ${n} done out of order: go back to bolt ${earlier[0]}`, 'warn'); S.active = earlier[0]; }
+  if (rawV > t.max * 1.25) quarantine(id, `Overload: ${f1(rawV)} ${U} on a ${t.max} ${U} wrench, recalibrate`);
+  else if (s.cycles >= t.limit && !s.quar) quarantine(id, `Cycle limit reached (${t.limit.toLocaleString()} load cycles): send for calibration`);
   render();
 }
 
 function simPull(){
-  const r = Math.random();
-  const v = S.outcome === 'over' ? 26.4 + r * 1.4 : S.outcome === 'under' ? 22.2 + r * 1.2 : 24.4 + r * 1.2;
-  onTorque(v, 'sim');
-  const pb = $('pullBtn'); if (pb) { pb.disabled = true; setTimeout(() => { const p = $('pullBtn'); if (p && S.toolState === 'connected') p.disabled = false; }, 450); }
+  if (pulling || S.toolState !== 'connected' || locked()) return;
+  const o = S.outcome, R = Math.random;
+  const run = o === 'worn' ? 0.3 + R() * 0.5 : 1.8 + R() * 1.6, target = TASK.target + Math.round(run * 10) / 10;
+  const v = o === 'over' ? target + 1.4 + R() * 1.4 : o === 'under' ? target - 2.8 + R() * 1.2 : target - 0.6 + R() * 1.2;
+  const pts = [];
+  for (let i = 0; i < 14; i++) pts.push(run * Math.min(1, (i + 1) / 3) * (0.85 + R() * 0.3));
+  for (let j = 1; j <= 12; j++) pts.push(run + (v - run) * Math.pow(j / 12, 1.7));
+  pts.push(v * .97, v * .5, 0);
+  const done = () => { pulling = false; G.live = null; S.curve = {pts:pts.map(p => Math.round(p * 10) / 10), total:pts.length, target, run:Math.round(run * 10) / 10, v}; onTorque(v, 'sim', run); };
+  if (FAST) { done(); return; }
+  pulling = true; const pb = $('pullBtn'); if (pb) pb.disabled = true;
+  let i = 0;
+  const tick = () => { i++; G.live = {pts:pts.slice(0, i), total:pts.length, target, run}; drawCurve(); if (i < pts.length) setTimeout(tick, 30); else done(); };
+  tick();
 }
 
-function finish(via){
-  if (S.signed) { toast('Already signed off'); return; }
-  const open = S.bolts.filter(b => b.status === 'open').map(b => b.n);
-  const bad = S.bolts.filter(b => b.status === 'bad').map(b => b.n);
-  const seq = S.bolts.filter(b => b.status === 'seq').map(b => b.n);
-  if (open.length || bad.length || seq.length) {
-    const parts = [];
-    if (open.length) parts.push(`not torqued: ${listNums(open)}`);
-    if (bad.length) parts.push(`out of tolerance: ${listNums(bad)}`);
-    if (seq.length) parts.push(`out of sequence, re-check: ${listNums(seq)}`);
-    S.finish = {ok:false, text:`Can't finish yet. Bolts ${parts.join('; ')}.`};
-    log(`Finish blocked (${via}): ${parts.join('; ')}`); toast('Not finished: bolts still open', 'bad');
-  } else { S.finish = {ok:true}; log(`All bolts in spec; finish confirmed (${via}). Waiting for sign-off.`); toast('All bolts in spec: scan badge to sign off', 'ok'); }
+function toolEvent(kind){
+  const id = S.tool; if (!id) return;
+  const t = TOOLS[id], s = TS(id);
+  if (kind === 'drop') { s.drops++; quarantine(id, 'Dropped: bench check required before next use'); render(); }
+  else { const raw = t.max * 1.3; onTorque(raw / factor(), 'sim', 2.5, raw); }
+}
+
+function benchCheck(id, pass){
+  if (!id) return;
+  const s = TS(id), t = TOOLS[id];
+  if (pass) { s.quar = null; s.events.unshift({t:Date.now(), text:'Bench check passed'}); log(`${id} bench check passed: back in service`); toast(`${id} back in service`, 'ok'); render(); return; }
+  s.events.unshift({t:Date.now(), text:'Failed check: out of tolerance as found'});
+  s.quar = {reason:'Failed check (out of tolerance as found): with calibration lab', t:Date.now()};
+  const jobs = (HISTORY[id] || []).filter(j => j.date >= t.calDone);
+  const hit = S.bolts.filter(b => b.tool === id && (b.status === 'ok' || b.status === 'seq'));
+  hit.forEach(b => { b.status = 'sus'; b.note = `Torqued with ${id}, which later failed its check. Re-torque with a serviceable wrench.`; if (S.insp) delete S.insp.confirmed[b.n]; });
+  if (hit.length && S.signed) { S.signed = null; S.finish = null; S.areaClear = false; if (S.insp) { S.insp.active = false; S.insp.signed = null; } log('Sign-off withdrawn: suspect torque on this panel'); }
+  S.impact = {tool:id, since:t.calDone, jobs, bolts:hit.map(b => b.n), t:Date.now()};
+  if (hit.length) S.active = hit[0].n;
+  log(`${id} failed check: ${jobs.length} earlier jobs and ${hit.length} bolts here traced as suspect`);
+  toast(`${id} failed: ${jobs.length} jobs + ${hit.length} bolts here flagged`, 'sus');
   render();
 }
 
+function logPart(lot, via){
+  const n = S.active || nextExpected() || 1, b = bolt(n), replacing = b.status === 'bad' && b.kind === 'lock';
+  S.parts.push({t:Date.now(), lot, bolt:n, what:replacing ? 'Replacement self-locking nut' : 'Self-locking nut batch'});
+  if (replacing) b.nutNew = lot;
+  log(`${replacing ? 'New nut' : 'Nut batch'} ${lot} logged for bolt ${n} (${via})`); toast(`${lot} logged for bolt ${n}`, 'ok'); render();
+}
+
+function finish(via){
+  if (phase() === 'inspect') return completeInspection(via);
+  if (locked()) { toast('Already signed off'); return; }
+  const by = st => S.bolts.filter(b => b.status === st).map(b => b.n);
+  const parts = [];
+  [['open', 'not torqued'], ['bad', 'out of tolerance'], ['seq', 'out of sequence, re-check'], ['sus', 'suspect tool, re-torque'], ['rej', 'rejected at inspection']].forEach(([k, l]) => { const a = by(k); if (a.length) parts.push(`${l}: ${listNums(a)}`); });
+  if (parts.length) { S.finish = {ok:false, text:`Can't finish yet. Bolts ${parts.join('; ')}.`}; log(`Finish blocked (${via}): ${parts.join('; ')}`); toast('Not finished: bolts still open', 'bad'); }
+  else { S.finish = {ok:true}; log(`All bolts in spec; close-out started (${via})`); toast('All bolts in spec: close out and sign', 'ok'); }
+  render();
+}
+function returnTool(id){
+  if (!S.out[id]) return;
+  S.out[id].ret = Date.now();
+  if (S.tool === id) { disconnect(true); S.tool = null; S.toolState = 'none'; }
+  if (S.adapter === id) S.adapter = null;
+  log(`${id} returned to tool store`); render();
+}
+function techSign(){
+  const out = Object.values(S.out).filter(o => !o.ret);
+  if (!S.finish || !S.finish.ok || out.length || !S.areaClear) return;
+  S.tech = ($('techId').value || 'T-0000').trim().toUpperCase();
+  S.signed = {tech:S.tech, t:Date.now()};
+  log(`Technician sign-off by ${S.tech} (badge scan simulated)`);
+  if (TASK.critical) { S.insp = S.insp || {id:'', active:false, confirmed:{}, checks:{}, rejects:[], signed:null, msg:''}; S.insp.msg = ''; toast('Signed: independent inspection required', 'ok'); }
+  render();
+}
+function startInspection(raw){
+  const id = (raw || '').trim().toUpperCase();
+  if (!id) { S.insp.msg = 'Enter the inspector ID.'; render(); return; }
+  if (id === S.signed.tech.toUpperCase()) { S.insp.msg = `The inspector must be a different person from the technician (${S.signed.tech}).`; log(`Inspection blocked: ${id} did the work`); render(); return; }
+  Object.assign(S.insp, {id, active:true, msg:''});
+  S.active = firstUnconfirmed();
+  log(`Independent inspection started by ${id}`); toast(`Inspection: ${id}`, 'ok'); render();
+}
+const firstUnconfirmed = () => { const b = S.bolts.find(b => !S.insp.confirmed[b.n]); return b ? b.n : null; };
+function confirmBolt(n, via){
+  if (phase() !== 'inspect') { toast('The OK sign confirms bolts during inspection'); return; }
+  if (!n || S.insp.confirmed[n]) return;
+  S.insp.confirmed[n] = {t:Date.now(), via};
+  log(`Inspector ${S.insp.id} confirmed bolt ${n} (${via})`); toast(`Bolt ${n} confirmed`, 'ok');
+  S.active = firstUnconfirmed(); render();
+}
+function rejectBolt(n, reason){
+  const b = bolt(n);
+  b.status = 'rej'; b.note = `Rejected at inspection by ${S.insp.id}: ${reason}. Rework, then sign again.`;
+  delete S.insp.confirmed[n];
+  S.insp.rejects.push({n, reason, t:Date.now()});
+  S.insp.active = false; S.signed = null; S.finish = null; S.areaClear = false; S.active = n;
+  log(`Inspector ${S.insp.id} rejected bolt ${n}: ${reason}. Task returned to technician.`); toast(`Bolt ${n} rejected: back to technician`, 'bad'); render();
+}
+function completeInspection(via){
+  const n = Object.keys(S.insp.confirmed).length, k = S.insp.checks, miss = [];
+  if (n < 12) miss.push(`confirm bolts ${listNums(S.bolts.filter(b => !S.insp.confirmed[b.n]).map(b => b.n))}`);
+  ['assembly', 'locking', 'operation'].forEach(x => { if (!k[x]) miss.push(`tick ${x}`); });
+  if (miss.length) { S.insp.msg = `Not complete: ${miss.join('; ')}.`; toast('Inspection not complete', 'bad'); render(); return; }
+  S.insp.signed = {id:S.insp.id, t:Date.now()}; S.insp.active = false; S.insp.msg = '';
+  log(`Independent inspection complete: signed by ${S.insp.id} (${via})`); toast('Inspection signed: task closed', 'ok'); render();
+}
+
 function handover(){
-  const d = new Date(), t = S.tool;
-  const ok = S.bolts.filter(b => b.status === 'ok').length;
-  const open = S.bolts.filter(b => b.status === 'open').map(b => b.n);
-  const bad = S.bolts.filter(b => b.status === 'bad');
-  const seq = S.bolts.filter(b => b.status === 'seq');
+  const d = new Date(), id = S.tool, ph = phase();
+  const ok = S.bolts.filter(b => b.status === 'ok').length, by = st => S.bolts.filter(b => b.status === st);
   const nx = nextExpected();
-  const L = [`HANDOVER: Refit access panel 571AB (demo task)`,
-    `${d.toLocaleDateString([], {day:'2-digit', month:'short', year:'numeric'})} ${hhmm(d)} · Staff ${S.tech}` + (t ? ` · Tool ${t.id}, calibration due ${fmtDate(t.cal)}` : ' · No tool scanned'),
-    ``, `Progress: ${ok} of 12 bolts torqued in spec (${TGT} ± ${TOL} ${SPEC.unit}).`];
-  if (open.length) L.push(`Not torqued: bolts ${listNums(open)}.`);
-  bad.forEach(b => L.push(`Out of tolerance: bolt ${b.n} at ${b.reading.toFixed(1)} ${SPEC.unit} (${b.kind}). Follow the task card before re-torquing.`));
-  seq.forEach(b => L.push(`Out of sequence: bolt ${b.n} at ${b.reading.toFixed(1)} ${SPEC.unit}. Re-check after earlier bolts.`));
-  if (S.photos.length) L.push(`Photos: ${S.photos.length} (bolts ${[...new Set(S.photos.map(p => p.bolt))].join(', ')}).`);
-  L.push(S.signed ? `Signed off by ${S.signed.tech} at ${hhmm(S.signed.t)}.` : nx ? `Next shift: continue from bolt ${nx} in the numbered order.` : `All bolts in spec: ready for sign-off.`);
+  const L = [`HANDOVER: ${TASK.title}, ${TASK.ac} (${WO.no}, demo)`, `${d.toLocaleDateString([], {day:'2-digit', month:'short', year:'numeric'})} ${hhmm(d)} · Staff ${S.tech}`, '',
+    `Progress: ${ok} of 12 bolts in spec (${TGT} ± ${TOL} ${U} plus running torque).`];
+  if (by('open').length) L.push(`Not torqued: bolts ${listNums(by('open').map(b => b.n))}.`);
+  by('bad').forEach(b => L.push(b.kind === 'lock' ? `Bolt ${b.n}: locking feature worn (running ${f1(b.run)} ${U}).${b.nutNew ? ` New nut ${b.nutNew} fitted, torque again.` : ' Replace nut.'}` : `Bolt ${b.n}: ${f1(b.reading)} ${U}, ${b.kind}-torqued (target ${f1(b.target)}). Follow the task card.`));
+  by('seq').forEach(b => L.push(`Bolt ${b.n}: out of sequence. Re-check after earlier bolts.`));
+  if (by('sus').length) L.push(`Suspect (tool failed check): bolts ${listNums(by('sus').map(b => b.n))}. Re-torque with a serviceable wrench.`);
+  by('rej').forEach(b => L.push(`Bolt ${b.n}: ${b.note}`));
+  const out = Object.entries(S.out).filter(([, o]) => !o.ret).map(([k]) => k);
+  if (out.length) L.push(`Tools still checked out: ${out.join(', ')}.`);
+  if (id) L.push(`Wrench ${id}: ${TS(id).cycles.toLocaleString()} cycles since calibration, ${TS(id).quar ? 'QUARANTINED' : 'serviceable'}.`);
+  const h = heat(S.wbgt); if (h.lv) L.push(`Heat: WBGT ${f1(S.wbgt)} °C, ${h.band.toLowerCase()}. ${h.text}`);
+  if (recurring().length) L.push(`Twin: repeat problems on bolt${recurring().length > 1 ? 's' : ''} ${listNums(recurring())}; check nut and thread condition.`);
+  if (S.photos.length) L.push(`Photos: ${S.photos.length}.`);
+  L.push(ph === 'closed' ? `Closed: signed ${S.signed.tech}, inspected ${S.insp.signed.id}.` : ph === 'await' ? `Signed by ${S.signed.tech}. Waiting for independent inspection.` : ph === 'inspect' ? `Inspection in progress by ${S.insp.id}: ${Object.keys(S.insp.confirmed).length} of 12 confirmed.` : nx ? `Next shift: continue from bolt ${nx} in the numbered order.` : 'All bolts in spec: close out and sign.');
   return L.join('\n');
 }
 
-function addPhoto(src){ S.photos.unshift({src, bolt:S.active || nextExpected() || 12, t:Date.now()}); S.photos = S.photos.slice(0, 8); log(`Evidence photo taken for bolt ${S.photos[0].bolt}`); toast(`Photo saved for bolt ${S.photos[0].bolt}`, 'ok'); render(); }
-function shrink(source, w, h, max){ const s = Math.min(1, max / Math.max(w, h)); const c = document.createElement('canvas'); c.width = Math.round(w * s); c.height = Math.round(h * s); c.getContext('2d').drawImage(source, 0, 0, c.width, c.height); return c; }
-function takePhoto(){
+function addPhoto(src){ const n = S.active || nextExpected() || 12; S.photos.unshift({src, bolt:n, t:Date.now()}); S.photos = S.photos.slice(0, 8); log(`Evidence photo for bolt ${n}`); toast(`Photo saved for bolt ${n}`, 'ok'); render(); }
+function shrink(source, w, h, max){ const s = Math.min(1, max / Math.max(w, h)); const c = document.createElement('canvas'); c.width = Math.max(1, Math.round(w * s)); c.height = Math.max(1, Math.round(h * s)); c.getContext('2d').drawImage(source, 0, 0, c.width, c.height); return c; }
+function takePhoto(){ const v = $('video'); if (cam.stream && v.videoWidth) addPhoto(shrink(v, v.videoWidth, v.videoHeight, 360).toDataURL('image/jpeg', .7)); else $('phFile').click(); }
+
+function stripeCheck(){
   const v = $('video');
-  if (cam.stream && v.videoWidth) addPhoto(shrink(v, v.videoWidth, v.videoHeight, 360).toDataURL('image/jpeg', .7));
-  else $('phFile').click();
+  if (cam.stream && v.videoWidth) analyzeStripe(shrink(v, v.videoWidth, v.videoHeight, 480));
+  else $('stFile').click();
+}
+function analyzeStripe(canvas){
+  const b = bolt(S.active); if (!b || b.status !== 'ok') return;
+  const ctx = canvas.getContext('2d'), W = canvas.width, H = canvas.height;
+  const x0 = Math.round(W * .2), y0 = Math.round(H * .2), w = Math.round(W * .6), h = Math.round(H * .6);
+  const d = ctx.getImageData(x0, y0, w, h).data, [lo, hi] = STRIPE[S.stripeColor];
+  let hit = 0, tot = 0;
+  for (let i = 0; i < d.length; i += 8) {
+    const r = d[i] / 255, g = d[i+1] / 255, bl = d[i+2] / 255, mx = Math.max(r, g, bl), mn = Math.min(r, g, bl), c = mx - mn;
+    tot++; if (mx < .3 || c / (mx || 1) < .45) continue;
+    let hue = mx === r ? ((g - bl) / c) % 6 : mx === g ? (bl - r) / c + 2 : (r - g) / c + 4; hue = (hue * 60 + 360) % 360;
+    if (lo <= hi ? hue >= lo && hue <= hi : hue >= lo || hue <= hi) hit++;
+  }
+  const pct = tot ? hit / tot * 100 : 0, ok = pct >= 1;
+  b.stripe = {ok, pct, color:S.stripeColor, t:Date.now(), img:shrink(canvas, W, H, 220).toDataURL('image/jpeg', .7)};
+  log(`Bolt ${b.n} torque stripe: ${ok ? 'colour found' : 'not seen'} (${pct.toFixed(1)}% ${S.stripeColor})`);
+  toast(ok ? `Bolt ${b.n}: stripe colour found` : `Bolt ${b.n}: no ${S.stripeColor} stripe seen`, ok ? 'ok' : 'warn');
+  render();
 }
 
 async function loadImage(file){ const url = URL.createObjectURL(file); try { const img = new Image(); img.src = url; await img.decode(); return img; } finally { setTimeout(() => URL.revokeObjectURL(url), 1000); } }
 
 function handleCode(text, via){
   const m = /^TT[:\s-]*([A-Z]{2})-?(\d{4})$/i.exec(String(text).trim());
-  if (!m) { if (via !== 'camera') toast('Not a TorqueTrace tool code', 'warn'); return; }
-  const id = (m[1] + '-' + m[2]).toUpperCase(), t = REGISTER[id];
+  if (!m) { if (via !== 'camera') toast('Not a TorqueTrace code', 'warn'); return; }
+  const id = (m[1] + '-' + m[2]).toUpperCase(), t = TOOLS[id];
+  if (m[1].toUpperCase() === 'LT') { logPart(id, via); return; }
   if (!t) { toast(`${id} is not in the tool register`, 'bad'); log(`Scanned ${id}: not in tool register`); render(); return; }
-  if (S.tool && S.tool.id === id) return;
+  if (t.kind === 'adapter') {
+    if (S.adapter === id) return;
+    S.adapter = id; checkOut(id); log(`Crowfoot ${id} fitted (E ${t.E} mm, ${via})`); toast(`${id} fitted: settings corrected`, 'ok'); render(); return;
+  }
+  if (S.tool === id) return;
   disconnect(true);
-  S.tool = t; S.toolState = 'checked'; G.scanUntil = 0;
-  const k = toolChecks(t);
-  log(`Scanned ${id} (${via}): ${k.calOk ? 'calibration in date' : 'CALIBRATION OVERDUE'}, ${k.rangeOk ? 'range OK' : 'WRONG RANGE'}`);
-  toast(k.ok ? `${id} checked: tap Connect` : `${id} failed checks`, k.ok ? 'ok' : 'bad');
+  S.tool = id; S.toolState = 'checked'; G.scanUntil = 0; checkOut(id);
+  const k = checks(id);
+  log(`Scanned ${id} (${via}): ${[k.cal ? 'calibration in date' : 'CALIBRATION OVERDUE', k.cyc ? 'cycles OK' : 'CYCLE LIMIT', k.range ? 'range OK' : 'WRONG RANGE', k.health ? '' : 'QUARANTINED'].filter(Boolean).join(', ')}`);
+  toast(k.ok ? (safetyDone() ? `${id} checked: tap Connect` : `${id} checked: finish the safety check`) : `${id} failed checks`, k.ok ? 'ok' : 'bad');
   render();
 }
 
 async function decodeSource(src, w, h){
-  if ('BarcodeDetector' in window) { try { const det = new BarcodeDetector({formats:['qr_code']}); const r = await det.detect(src); if (r.length) return r[0].rawValue; } catch (e) {} }
-  if (window.jsQR) { const c = shrink(src, w, h, 900); const ctx = c.getContext('2d'); const d = ctx.getImageData(0, 0, c.width, c.height); const r = window.jsQR(d.data, c.width, c.height, {inversionAttempts:'attemptBoth'}); if (r) return r.data; }
+  if ('BarcodeDetector' in window) { try { const det = new BarcodeDetector({formats:['qr_code', 'data_matrix']}); const r = await det.detect(src); if (r.length) return r[0].rawValue; } catch (e) {} }
+  if (window.jsQR) { const c = shrink(src, w, h, 900); const d = c.getContext('2d').getImageData(0, 0, c.width, c.height); const r = window.jsQR(d.data, c.width, c.height, {inversionAttempts:'attemptBoth'}); if (r) return r.data; }
   return null;
 }
-
 $('qrFile').onchange = async e => {
   const f = e.target.files[0]; e.target.value = ''; if (!f) return;
   try { const img = await loadImage(f); const code = await decodeSource(img, img.naturalWidth, img.naturalHeight); if (code) handleCode(code, 'photo'); else toast('No QR code found in that photo', 'warn'); }
   catch (err) { toast('Could not read that image', 'bad'); }
 };
-$('phFile').onchange = async e => {
-  const f = e.target.files[0]; e.target.value = ''; if (!f) return;
-  try { const img = await loadImage(f); addPhoto(shrink(img, img.naturalWidth, img.naturalHeight, 360).toDataURL('image/jpeg', .7)); } catch (err) { toast('Could not read that image', 'bad'); }
-};
+$('phFile').onchange = async e => { const f = e.target.files[0]; e.target.value = ''; if (!f) return; try { const img = await loadImage(f); addPhoto(shrink(img, img.naturalWidth, img.naturalHeight, 360).toDataURL('image/jpeg', .7)); } catch (err) { toast('Could not read that image', 'bad'); } };
+$('stFile').onchange = async e => { const f = e.target.files[0]; e.target.value = ''; if (!f) return; try { const img = await loadImage(f); analyzeStripe(shrink(img, img.naturalWidth, img.naturalHeight, 480)); } catch (err) { toast('Could not read that image', 'bad'); } };
 
 const needScan = () => !!cam.stream && (!S.tool || performance.now() < G.scanUntil);
 function scanWithCamera(){ G.scanUntil = performance.now() + 20000; if (!cam.stream) startCamera(); else toast('Hold the sticker up to the camera'); hud(); }
@@ -435,50 +860,51 @@ async function scanFrame(){
 }
 
 async function connect(){
-  if (!S.tool || !toolChecks(S.tool).ok) return;
+  if (!S.tool || !checks(S.tool).ok || locked()) return;
+  if (!safetyDone()) { toast('Complete the pre-task safety check first', 'warn'); log('Connect blocked: safety check not done'); render(); return; }
   if (S.mode === 'sim') {
     S.toolState = 'connecting'; render();
-    setTimeout(() => { if (S.toolState !== 'connecting') return; S.toolState = 'connected'; log(`${S.tool.id} connected (simulated wrench)`); toast(`${S.tool.id} connected`, 'ok'); render(); }, 700);
+    setTimeout(() => { if (S.toolState !== 'connecting') return; S.toolState = 'connected'; log(`${S.tool} connected (simulated wrench); preset sent for bolt ${S.active || nextExpected()}`); toast(`${S.tool} connected`, 'ok'); render(); }, FAST ? 0 : 700);
     return;
   }
   if (!navigator.bluetooth) { toast('Bluetooth needs Chrome on Android over https', 'warn'); log('Bluetooth not available in this browser'); render(); return; }
-  const name = 'TT-' + S.tool.id.replace('-', '');
+  const name = 'TT-' + S.tool.replace('-', '');
   try {
     S.toolState = 'connecting'; render();
     const dev = await navigator.bluetooth.requestDevice({filters:[{name}], optionalServices:[NUS]});
-    const server = await dev.gatt.connect();
-    const svc = await server.getPrimaryService(NUS);
-    const tx = await svc.getCharacteristic(NUS_TX);
+    const server = await dev.gatt.connect(), svc = await server.getPrimaryService(NUS), tx = await svc.getCharacteristic(NUS_TX);
     await tx.startNotifications();
     let buf = '';
     tx.addEventListener('characteristicvaluechanged', e => { buf += new TextDecoder().decode(e.target.value); let i; while ((i = buf.indexOf('\n')) >= 0) { onLine(buf.slice(0, i).trim()); buf = buf.slice(i + 1); } });
-    dev.addEventListener('gattserverdisconnected', () => { if (ble && ble.dev === dev) { ble = null; if (S.toolState === 'connected') { S.toolState = 'checked'; log(`${S.tool ? S.tool.id : 'Wrench'} disconnected`); toast('Wrench disconnected', 'warn'); render(); } } });
-    ble = {dev};
-    S.toolState = 'connected'; log(`${S.tool.id} connected over Bluetooth (${name})`); toast(`${S.tool.id} connected`, 'ok'); render();
+    dev.addEventListener('gattserverdisconnected', () => { if (ble && ble.dev === dev) { ble = null; if (S.toolState === 'connected') { S.toolState = 'checked'; log(`${S.tool || 'Wrench'} disconnected`); toast('Wrench disconnected', 'warn'); render(); } } });
+    ble = {dev}; S.toolState = 'connected'; log(`${S.tool} connected over Bluetooth (${name})`); toast(`${S.tool} connected`, 'ok'); render();
     try { const rx = await svc.getCharacteristic(NUS_RX); await rx.writeValue(new TextEncoder().encode('ID?\n')); } catch (e) {}
   } catch (err) {
-    S.toolState = 'checked'; render();
+    S.toolState = 'checked';
     toast(err && err.name === 'NotFoundError' ? 'No wrench chosen' : 'Bluetooth connection failed', 'warn');
     log(`Bluetooth connect failed: ${err && err.message ? err.message : err}`); render();
   }
 }
 function onLine(line){
-  if (line.startsWith('TQ:')) { const v = parseFloat(line.slice(3)); if (isFinite(v)) onTorque(v, 'wrench'); }
-  else if (line.startsWith('ID:')) { const id = line.slice(3).trim(); if (S.tool && id !== S.tool.id) { log(`Wrench reports ${id}, sticker says ${S.tool.id}: disconnected`); toast('Sticker and wrench do not match', 'bad'); disconnect(); } else log(`Wrench confirmed its ID: ${id}`); render(); }
+  if (line.startsWith('LV:')) { const v = parseFloat(line.slice(3)); if (isFinite(v)) { G.live = G.live || {pts:[], total:40, target:TASK.target + (G.run || 0), run:G.run}; G.live.pts.push(v / factor()); G.live.total = Math.max(G.live.total, G.live.pts.length); drawCurve(); } }
+  else if (line.startsWith('RT:')) { const v = parseFloat(line.slice(3)); if (isFinite(v)) { G.run = v; if (G.live) { G.live.run = v; G.live.target = TASK.target + v; } } }
+  else if (line.startsWith('TQ:')) { const raw = parseFloat(line.slice(3)); if (isFinite(raw)) { const pts = G.live ? G.live.pts : [raw / factor()]; S.curve = {pts, total:pts.length, target:TASK.target + (G.run || 0), run:G.run, v:raw / factor()}; G.live = null; onTorque(raw / factor(), 'wrench', G.run, raw); G.run = null; } }
+  else if (line.startsWith('BT:')) { const v = parseFloat(line.slice(3)); if (isFinite(v)) { S.tele.batt = v; updateLive(); } }
+  else if (line === 'EV:DROP') toolEvent('drop');
+  else if (line === 'EV:OVER' && S.tool) { TS(S.tool).overloads++; quarantine(S.tool, 'Overload reported by the wrench: recalibrate'); render(); }
+  else if (line.startsWith('ID:')) { const id = line.slice(3).trim(); if (S.tool && id !== S.tool) { log(`Wrench reports ${id}, sticker says ${S.tool}: disconnected`); toast('Sticker and wrench do not match', 'bad'); disconnect(); } else log(`Wrench confirmed its ID: ${id}`); render(); }
 }
 function disconnect(quiet){
   if (ble && ble.dev && ble.dev.gatt.connected) { try { ble.dev.gatt.disconnect(); } catch (e) {} }
   ble = null;
-  if (S.toolState === 'connected' || S.toolState === 'connecting') { S.toolState = S.tool ? 'checked' : 'none'; if (!quiet) { log(`${S.tool ? S.tool.id : 'Tool'} disconnected`); render(); } }
+  if (S.toolState === 'connected' || S.toolState === 'connecting') { S.toolState = S.tool ? 'checked' : 'none'; if (!quiet) { log(`${S.tool || 'Wrench'} disconnected`); render(); } }
 }
 
 async function startCamera(){
-  const note = $('camnote');
-  note.classList.remove('show');
+  $('camnote').classList.remove('show');
   if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { showCamNote(); return; }
-  try {
-    cam.stream = await navigator.mediaDevices.getUserMedia({video:{facingMode:cam.facing, width:{ideal:1280}, height:{ideal:720}}, audio:false});
-  } catch (err) { cam.stream = null; showCamNote(err); return; }
+  try { cam.stream = await navigator.mediaDevices.getUserMedia({video:{facingMode:cam.facing, width:{ideal:1280}, height:{ideal:720}}, audio:false}); }
+  catch (err) { cam.stream = null; showCamNote(err); return; }
   const v = $('video'); v.srcObject = cam.stream; try { await v.play(); } catch (e) {}
   const s = cam.stream.getVideoTracks()[0].getSettings();
   cam.mirror = s.facingMode ? s.facingMode === 'user' : cam.facing === 'user';
@@ -489,8 +915,7 @@ async function startCamera(){
   if (!rec && recState !== 'loading') loadRecognizer();
 }
 function showCamNote(err){
-  const framed = window.self !== window.top;
-  $('camnote').innerHTML = framed ? '<b>The camera is blocked in this preview.</b> Host the file on https and open it in Chrome on your tablet (see "Run it on a tablet"). Tapping, the simulated wrench and QR from a photo work here.' : `<b>Camera not available.</b> ${err && err.name === 'NotAllowedError' ? 'Allow camera access in the browser settings.' : 'Open the page over https in Chrome.'} You can still tap bolts and scan QR from a photo.`;
+  $('camnote').innerHTML = FRAMED ? '<b>The camera is blocked in this preview.</b> Open the GitHub Pages link in Chrome on your tablet. Tapping, the simulated wrench and QR or stripe photos work here.' : `<b>Camera not available.</b> ${err && err.name === 'NotAllowedError' ? 'Allow camera access in the browser settings.' : 'Open the page over https in Chrome.'} You can still tap bolts and use photos.`;
   $('camnote').classList.add('show'); setTimeout(() => $('camnote').classList.remove('show'), 9000);
   render();
 }
@@ -505,7 +930,7 @@ async function loadRecognizer(){
   try {
     const {FilesetResolver, GestureRecognizer} = await import(MP + '/vision_bundle.mjs');
     const files = await FilesetResolver.forVisionTasks(MP + '/wasm');
-    const opts = d => ({baseOptions:{modelAssetPath:MODEL, delegate:d}, runningMode:'VIDEO', numHands:1, minHandDetectionConfidence:.5, minHandPresenceConfidence:.5, minTrackingConfidence:.5});
+    const opts = d => ({baseOptions:{modelAssetPath:MODEL, delegate:d}, runningMode:'VIDEO', numHands:2, minHandDetectionConfidence:.5, minHandPresenceConfidence:.5, minTrackingConfidence:.5});
     try { rec = await GestureRecognizer.createFromOptions(files, opts('GPU')); } catch (e) { rec = await GestureRecognizer.createFromOptions(files, opts('CPU')); }
     recState = 'ready'; log('Gesture model ready');
   } catch (err) { recState = 'failed'; log('Gesture model failed to load'); }
@@ -518,10 +943,10 @@ function loop(){
   if (rec && v.readyState >= 2 && v.currentTime !== lastVT) {
     lastVT = v.currentTime;
     let r = null; try { r = rec.recognizeForVideo(v, t); } catch (e) {}
-    const lm = r && r.landmarks && r.landmarks[0];
-    const g = r && r.gestures && r.gestures[0] && r.gestures[0][0];
-    handleHand(lm ? (g && g.score >= .6 ? g.categoryName : 'None') : null, lm, t);
-    drawHand(lm);
+    const hands = (r && r.landmarks) || [], g = r && r.gestures && r.gestures[0] && r.gestures[0][0];
+    if (hands.length >= 2) handleTwo(hands[0], hands[1], t);
+    else handleHand(hands[0] ? (g && g.score >= .6 ? g.categoryName : 'None') : null, hands[0], t);
+    drawHands(hands);
   }
   if (needScan() && t - lastScan > 450) { lastScan = t; scanFrame(); }
   raf = requestAnimationFrame(loop);
@@ -532,21 +957,31 @@ function toLocal(p){
   const vw = v.videoWidth || W, vh = v.videoHeight || H, s = Math.max(W / vw, H / vh), dw = vw * s, dh = vh * s;
   return {x:(cam.mirror ? 1 - p.x : p.x) * dw + (W - dw) / 2, y:p.y * dh + (H - dh) / 2};
 }
-function isPointing(lm){
-  const d = (a, b) => Math.hypot(lm[a].x - lm[b].x, lm[a].y - lm[b].y);
-  const ext = (tip, pip) => d(tip, 0) > d(pip, 0) * 1.12;
-  return ext(8, 6) && !ext(12, 10) && !ext(16, 14) && !ext(20, 18);
-}
+const dist = (lm, a, b) => Math.hypot(lm[a].x - lm[b].x, lm[a].y - lm[b].y);
+const ext = (lm, tip, pip) => dist(lm, tip, 0) > dist(lm, pip, 0) * 1.12;
+const isPointing = lm => ext(lm, 8, 6) && !ext(lm, 12, 10) && !ext(lm, 16, 14) && !ext(lm, 20, 18);
+const isOK = lm => dist(lm, 4, 8) < dist(lm, 0, 9) * .3 && ext(lm, 12, 10) && ext(lm, 16, 14) && ext(lm, 20, 18);
+const countFingers = lm => [[8, 6], [12, 10], [16, 14], [20, 18]].filter(([a, b]) => ext(lm, a, b)).length + (dist(lm, 4, 17) > dist(lm, 3, 17) * 1.08 ? 1 : 0);
 function boltAt(x, y){
   const r0 = $('vp').getBoundingClientRect(); let best = null, bd = 1e9;
-  $('ov').querySelectorAll('.bolt').forEach(g => { const r = g.querySelector('.ring').getBoundingClientRect(); const cx = r.left - r0.left + r.width / 2, cy = r.top - r0.top + r.height / 2; const dist = Math.hypot(x - cx, y - cy); if (dist < Math.max(r.width * .85, 30) && dist < bd) { bd = dist; best = +g.dataset.n; } });
+  $('ov').querySelectorAll('.bolt').forEach(g => { const r = g.querySelector('.ring').getBoundingClientRect(); const cx = r.left - r0.left + r.width / 2, cy = r.top - r0.top + r.height / 2; const dd = Math.hypot(x - cx, y - cy); if (dd < Math.max(r.width * .85, 30) && dd < bd) { bd = dd; best = +g.dataset.n; } });
   return best;
+}
+function handleTwo(a, b, t){
+  $('cursor').style.display = 'none'; G.cand = null; G.hist = [];
+  if (!S.gestures) { hud(null, 0, 'Two hands seen'); return; }
+  const c = countFingers(a) + countFingers(b);
+  if (c !== G.count) { G.count = c; G.ct0 = t; G.cfired = false; }
+  const prog = c >= 1 && c <= 12 ? Math.min(1, (t - G.ct0) / 1000) : 0;
+  if (prog >= 1 && !G.cfired && t > G.cool) { G.cfired = true; G.cool = t + 1200; select(c); toast(`Bolt ${c} selected`); log(`Finger count ${c}: bolt ${c} selected`); }
+  hud(null, G.cfired ? 0 : prog, `Two hands: ${c} finger${c === 1 ? '' : 's'}${c >= 1 && c <= 12 ? ` → bolt ${c}` : ''}`);
 }
 function handleHand(label, lm, t){
   const cur = $('cursor');
+  G.count = -1;
   if (!lm) { G.cand = null; G.hist = []; G.dwellB = null; cur.style.display = 'none'; hud(); return; }
   const pts = lm.map(toLocal), W = $('vp').clientWidth;
-  let L = isPointing(lm) ? 'Point' : label;
+  const L = isOK(lm) ? 'OK' : isPointing(lm) ? 'Point' : label;
   G.hist.push({t, x:pts[0].x}); while (G.hist.length && t - G.hist[0].t > 500) G.hist.shift();
   if (S.gestures && t > G.cool && L !== 'Point' && G.hist.length > 3) {
     const dx = pts[0].x - G.hist[0].x;
@@ -571,40 +1006,48 @@ function fire(L){
   if (L === 'Open_Palm') { S.gestures = !S.gestures; log(`Gestures turned ${S.gestures ? 'on' : 'off'} (open palm)`); toast(`Gestures ${S.gestures ? 'on' : 'off'}`, S.gestures ? 'ok' : ''); render(); }
   else if (L === 'Closed_Fist') takePhoto();
   else if (L === 'Thumb_Up') finish('thumbs up');
+  else if (L === 'OK') confirmBolt(S.active, 'OK sign');
 }
 const CONN = [[0,1],[1,2],[2,3],[3,4],[0,5],[5,6],[6,7],[7,8],[5,9],[9,10],[10,11],[11,12],[9,13],[13,14],[14,15],[15,16],[13,17],[0,17],[17,18],[18,19],[19,20]];
 function clearCanvas(){ const c = $('cv'); c.getContext('2d').clearRect(0, 0, c.width, c.height); }
-function drawHand(lm){
+function drawHands(hands){
   const c = $('cv'), vp = $('vp'), dpr = window.devicePixelRatio || 1, W = vp.clientWidth, H = vp.clientHeight;
   if (c.width !== Math.round(W * dpr) || c.height !== Math.round(H * dpr)) { c.width = Math.round(W * dpr); c.height = Math.round(H * dpr); }
   const x = c.getContext('2d'); x.setTransform(dpr, 0, 0, dpr, 0, 0); x.clearRect(0, 0, W, H);
-  if (!lm) return;
-  const p = lm.map(toLocal), col = S.gestures ? '#c4d33b' : 'rgba(255,255,255,.75)';
-  x.lineWidth = 3; x.strokeStyle = col; x.beginPath(); CONN.forEach(([a, b]) => { x.moveTo(p[a].x, p[a].y); x.lineTo(p[b].x, p[b].y); }); x.stroke();
-  x.fillStyle = '#fff'; p.forEach(q => { x.beginPath(); x.arc(q.x, q.y, 3.5, 0, 7); x.fill(); });
+  hands.forEach(lm => {
+    const p = lm.map(toLocal);
+    x.lineWidth = 3; x.strokeStyle = S.gestures ? '#c4d33b' : 'rgba(255,255,255,.75)'; x.beginPath(); CONN.forEach(([a, b]) => { x.moveTo(p[a].x, p[a].y); x.lineTo(p[b].x, p[b].y); }); x.stroke();
+    x.fillStyle = '#fff'; p.forEach(q => { x.beginPath(); x.arc(q.x, q.y, 3.5, 0, 7); x.fill(); });
+  });
 }
 
 $('camBtn').onclick = () => cam.stream ? stopCamera() : startCamera();
 $('flipBtn').onclick = () => { cam.facing = cam.facing === 'user' ? 'environment' : 'user'; if (cam.stream) { cam.stream.getTracks().forEach(t => t.stop()); cam.stream = null; } startCamera(); };
+$('twinBtn').onclick = toggleTwin;
+document.querySelectorAll('[data-wbgt]').forEach(b => b.onclick = () => { const was = heat(S.wbgt).lv; S.wbgt = +b.dataset.wbgt; const h = heat(S.wbgt); log(`Heat sensor: WBGT ${f1(S.wbgt)} °C (${h.band.toLowerCase()})`); if (h.lv > was && h.lv) toast(`Heat stress: ${h.text}`, h.lv >= 2 ? 'bad' : 'warn'); render(); });
 $('photoBtn').onclick = takePhoto;
+$('csvDl').onclick = () => { try { const url = URL.createObjectURL(new Blob([csv()], {type:'text/csv'})); const a = document.createElement('a'); a.href = url; a.download = `torquetrace-${WO.no}.csv`; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 2000); log('Data log downloaded as CSV'); render(); } catch (e) { toast('Download not available here'); } };
+$('csvCopy').onclick = () => copyText(csv(), 'CSV copied');
 $('hoBtn').onclick = () => { const ta = $('hoText'); ta.value = handover(); ta.classList.remove('hidden'); $('copyBtn').disabled = false; log('Handover summary generated'); render(); };
 $('copyBtn').onclick = async () => { const ta = $('hoText'); try { await navigator.clipboard.writeText(ta.value); toast('Summary copied', 'ok'); } catch (e) { ta.focus(); ta.select(); toast('Press copy on your keyboard or menu'); } };
-$('resetBtn').onclick = () => { const b = $('resetBtn'); if (Date.now() < resetArm) { disconnect(true); const keepMode = S.mode; S = fresh(); S.mode = keepMode; $('hoText').classList.add('hidden'); $('copyBtn').disabled = true; log('Task reset'); toast('Task reset'); b.textContent = 'Reset task'; resetArm = 0; render(); } else { resetArm = Date.now() + 3000; b.textContent = 'Tap again to reset'; setTimeout(() => { if (Date.now() >= resetArm) b.textContent = 'Reset task'; }, 3100); } };
+$('resetBtn').onclick = () => { const b = $('resetBtn'); if (Date.now() < resetArm) { disconnect(true); const keep = S.mode; S = fresh(); S.mode = keep; $('hoText').classList.add('hidden'); $('copyBtn').disabled = true; log('Task reset'); toast('Task reset'); b.textContent = 'Reset task'; resetArm = 0; render(); } else { resetArm = Date.now() + 3000; b.textContent = 'Tap again to reset'; setTimeout(() => { if (Date.now() >= resetArm) b.textContent = 'Reset task'; }, 3100); } };
 document.addEventListener('keydown', e => {
   if (e.target.matches('input,textarea,select') || e.metaKey || e.ctrlKey || e.altKey) return;
   const k = e.key.toLowerCase();
-  if (k === 't' || k === ' ') { e.preventDefault(); if (S.toolState === 'connected') simPull(); else toast('Connect a tool first', 'warn'); }
+  if (k === 't' || k === ' ') { e.preventDefault(); if (S.toolState === 'connected') simPull(); else toast('Connect a wrench first', 'warn'); }
   else if (k === 'n') step(1); else if (k === 'b') step(-1);
   else if (k === 'g') { S.gestures = !S.gestures; log(`Gestures turned ${S.gestures ? 'on' : 'off'} (keyboard)`); render(); }
-  else if (k === 'p') takePhoto(); else if (k === 'f') finish('keyboard');
+  else if (k === 'p') takePhoto(); else if (k === 'f') finish('keyboard'); else if (k === 'o') confirmBolt(S.active, 'keyboard');
 });
 const setTop = () => document.documentElement.style.setProperty('--toph', $('top').offsetHeight + 'px');
 const topObs = new ResizeObserver(setTop); topObs.observe($('top'));
+const curveObs = new ResizeObserver(drawCurve); curveObs.observe($('curveFig'));
+const teleTimer = setInterval(() => { if (S.toolState === 'connected' && S.mode === 'sim') { S.tele.rssi = -55 - Math.random() * 15; S.tele.temp = 30 + Math.random() * 3; updateLive(); } }, 2000);
 
 buildOverlay(); setTop();
 if (!S.log.length) log('Task opened: refit access panel 571AB');
 render();
-window.__tt = {S:() => S, handleCode, onTorque, handleHand, fire, finish, handover};
+window.__tt = {S:() => S, handleCode, onTorque, handleHand, handleTwo, fire, finish, handover, analyzeStripe, confirmBolt, csv, fast:v => { FAST = v; }, teleTimer};
 }
 </script>
 </body>
