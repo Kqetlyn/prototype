@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TorqueTrace prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Semi+Condensed:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+/* VOICE: a shipped hangar tool, calm and readable at arm's length
+   IDEA: a task card clipped beside the aircraft panel being worked on
+   PICTURE: live camera with the access panel overlaid; without camera, drawn aluminium skin and panel
+   COLOUR and TYPE: graphite or paper ground, aluminium greys, zinc-chromate accent, status green/red/orange; Barlow family
+   LAYOUT: camera view left, task rail right; stacks under 900px */
+:root{color-scheme:light dark;--bg:light-dark(#eceeea,#0f1214);--card:light-dark(#ffffff,#181d20);--ink:light-dark(#151a1d,#e9ece8);--mute:light-dark(#596267,#9ba5a9);--line:light-dark(#d4d8d4,#2a3135);--tint:light-dark(#f4f5f2,#1e2427);--acc:#c4d33b;--acc-ink:#1c2108;--ok:#2db574;--bad:#e23b31;--warn:#ef8d24;--sel:#4aa3ff}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 Barlow,system-ui,sans-serif;overflow-x:clip}
+h1,h2,.cond{font-family:"Barlow Semi Condensed",Barlow,sans-serif}
+button,select,input{font:inherit;color:inherit}
+.top{display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px;padding:10px max(2vw,14px);border-bottom:1px solid var(--line);background:var(--card)}
+.brand{margin:0;font-size:22px;font-weight:700;line-height:1;display:flex;align-items:baseline;gap:8px}
+.brand small{font:500 13px Barlow,sans-serif;color:var(--mute)}
+.task{flex:1 1 280px;font-size:15px;color:var(--mute)}.task b{color:var(--ink);font-weight:600}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;border:1px solid var(--line);font-size:13px;white-space:nowrap}
+.chip i{width:8px;height:8px;border-radius:50%;background:var(--mute)}
+.chip.on i{background:var(--ok)}.chip.warn i{background:var(--warn)}.chip.bad i{background:var(--bad)}
+.chip.acc{background:var(--acc);color:var(--acc-ink);border-color:var(--acc)}.chip.acc i{background:var(--acc-ink)}
+main{display:grid;grid-template-columns:minmax(0,1.65fr) minmax(330px,1fr);height:calc(100dvh - var(--toph,58px))}
+.vp{position:relative;overflow:hidden;background:#b3bac0;touch-action:manipulation;user-select:none}
+.vp video,.vp canvas,.vp svg.ov{position:absolute;inset:0;width:100%;height:100%}
+.vp video{object-fit:cover;display:none;background:#000}
+.vp.live{background:#000}.vp.live video{display:block}.vp.mirror video{transform:scaleX(-1)}
+.vp canvas{pointer-events:none}
+.skin .lap{fill:#9aa3a9}.skin .rv{fill:#8d969c}.skin .rvh{fill:#d3d8dc}
+.pnl{fill:#c7cdd2;stroke:#4c555b;stroke-width:3}.pnl-in{fill:none;stroke:#e3e7ea;stroke-width:1.5}
+.stencil{font:700 54px "Barlow Semi Condensed",sans-serif;fill:#87919a;letter-spacing:.08em}
+.plac{font:600 17px Barlow,sans-serif;fill:#6d777e}
+.live .skin{display:none}.live .pnl{fill:rgba(196,211,59,.08);stroke:var(--acc);stroke-dasharray:14 10}.live .pnl-in{display:none}
+.live .stencil,.live .plac{fill:rgba(255,255,255,.35)}
+.bolt{cursor:pointer}
+.bolt .head{fill:#dfe3e6;stroke:#59636a;stroke-width:2}.bolt .slot{stroke:#59636a;stroke-width:3;stroke-linecap:round}
+.live .bolt .head{fill:rgba(15,18,20,.5);stroke:#fff;stroke-width:2.5}.live .bolt .slot{stroke:#fff}
+.bolt .ring{fill:none;stroke:transparent;stroke-width:6}
+.bolt .sel{fill:none;stroke:transparent;stroke-width:3;stroke-dasharray:7 6}
+.bolt .tag rect{fill:#2a3034}.bolt .tag text{fill:#fff;font:700 15px "Barlow Semi Condensed",sans-serif;text-anchor:middle;dominant-baseline:central}
+.bolt .mk{display:none}.bolt .mk circle{stroke:#fff;stroke-width:2}.bolt .mk text{fill:#fff;font:700 13px Barlow,sans-serif;text-anchor:middle;dominant-baseline:central}
+.s-ok .ring{stroke:var(--ok)}.s-bad .ring{stroke:var(--bad)}.s-seq .ring{stroke:var(--warn)}
+.s-ok .mk,.s-bad .mk,.s-seq .mk{display:inline}
+.s-ok .mk circle{fill:var(--ok)}.s-bad .mk circle{fill:var(--bad)}.s-seq .mk circle{fill:var(--warn)}
+.s-ok .tag rect{fill:var(--ok)}.s-bad .tag rect{fill:var(--bad)}.s-seq .tag rect{fill:var(--warn)}
+.active .sel{stroke:var(--sel)}.active .tag rect{fill:var(--sel)}
+@media (prefers-reduced-motion:no-preference){.active .sel{animation:spin 6s linear infinite;transform-box:fill-box;transform-origin:center}@keyframes spin{to{transform:rotate(360deg)}}}
+.hud{position:absolute;left:12px;top:12px;max-width:min(70%,420px);padding:8px 12px;border-radius:10px;background:rgba(15,18,20,.78);color:#fff;font-size:14px;line-height:1.35}
+.hud b{font-weight:600}.hud .bar{height:5px;border-radius:3px;background:rgba(255,255,255,.2);margin-top:6px;overflow:hidden}.hud .bar i{display:block;height:100%;width:0;background:var(--acc)}
+.vpbtns{position:absolute;right:12px;top:12px;display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.vpbtns .btn{background:rgba(15,18,20,.78);color:#fff;border-color:rgba(255,255,255,.25)}
+.camnote{position:absolute;left:50%;bottom:64px;transform:translateX(-50%);width:min(92%,520px);padding:10px 14px;border-radius:10px;background:rgba(15,18,20,.85);color:#fff;font-size:14px;display:none}
+.camnote.show{display:block}
+.cursor{position:absolute;width:46px;height:46px;margin:-23px 0 0 -23px;border-radius:50%;border:3px solid #fff;pointer-events:none;display:none;--p:0;background:conic-gradient(var(--acc) calc(var(--p)*1turn),transparent 0) border-box;-webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 9px),#000 calc(100% - 8px));mask:radial-gradient(farthest-side,transparent calc(100% - 9px),#000 calc(100% - 8px))}
+.toast{position:absolute;left:50%;bottom:64px;transform:translateX(-50%);max-width:90%;padding:10px 16px;border-radius:10px;background:#fff;color:#151a1d;font-weight:500;box-shadow:0 6px 20px rgba(0,0,0,.25);opacity:0;transition:opacity .2s;pointer-events:none}
+.toast.show{opacity:1}.toast.bad{background:var(--bad);color:#fff}.toast.warn{background:var(--warn);color:#2a1600}.toast.ok{background:var(--ok);color:#06231a}
+.legend{position:absolute;left:0;right:0;bottom:0;display:flex;gap:6px;flex-wrap:wrap;padding:8px 12px;background:rgba(15,18,20,.72);color:#e9ece8;font-size:13px}
+.legend span{white-space:nowrap;padding:2px 8px;border-radius:6px;background:rgba(255,255,255,.08)}.legend b{font-weight:600;color:var(--acc)}
+.rail{overflow-y:auto;border-left:1px solid var(--line);padding:14px;display:grid;gap:12px;align-content:start}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px}
+.card h2{margin:0 0 10px;font-size:18px;font-weight:600;display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.card h2 span{font:400 13px Barlow,sans-serif;color:var(--mute);text-align:right}
+.btn{min-height:44px;padding:0 14px;border-radius:10px;border:1px solid var(--line);background:transparent;cursor:pointer;font-weight:500}
+.btn:hover{border-color:var(--mute)}.btn.pri{background:var(--acc);color:var(--acc-ink);border-color:var(--acc);font-weight:600}
+.btn:disabled{opacity:.45;cursor:not-allowed}.btn.wide{width:100%}
+.btn:focus-visible,.seg button:focus-visible,select:focus-visible,input:focus-visible,.tile:focus-visible{outline:3px solid var(--sel);outline-offset:2px}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.seg button{min-height:44px;padding:0 12px;border:0;background:transparent;cursor:pointer}
+.seg button[aria-pressed=true]{background:var(--ink);color:var(--bg)}
+.muted{color:var(--mute);font-size:14px}.small{font-size:13px;color:var(--mute)}
+.big{font:600 clamp(40px,5vw,56px)/1 "Barlow Semi Condensed",sans-serif;font-variant-numeric:tabular-nums;white-space:nowrap}
+.bolthead{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;margin-bottom:10px}
+.pill{display:inline-block;padding:2px 9px;border-radius:999px;font-size:13px;font-weight:600;white-space:nowrap}
+.p-open{background:var(--tint);color:var(--mute)}.p-ok{background:var(--ok);color:#06231a}.p-bad{background:var(--bad);color:#fff}.p-seq{background:var(--warn);color:#2a1600}.p-next{background:var(--sel);color:#04203d}
+.meter{height:8px;border-radius:4px;background:var(--tint);overflow:hidden;margin:8px 0 2px}.meter i{display:block;height:100%;background:var(--ok);width:0}
+.msg{margin:10px 0 0;padding:10px 12px;border-radius:10px;background:var(--tint);font-size:14px}
+.msg.bad{background:color-mix(in srgb,var(--bad) 16%,var(--card))}.msg.warn{background:color-mix(in srgb,var(--warn) 18%,var(--card))}.msg.ok{background:color-mix(in srgb,var(--ok) 18%,var(--card))}
+.tools dl{display:grid;grid-template-columns:auto 1fr;gap:2px 12px;margin:8px 0;font-size:14px}.tools dt{color:var(--mute)}.tools dd{margin:0;font-variant-numeric:tabular-nums}
+.check{display:flex;gap:8px;align-items:baseline;font-size:14px}.check b{width:18px;flex:none;text-align:center}.check.y b{color:var(--ok)}.check.n b{color:var(--bad)}
+.demo{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}.demo .btn{min-height:36px;font-size:14px;padding:0 10px}
+.bl{display:grid;grid-template-columns:repeat(auto-fill,minmax(68px,1fr));gap:6px}
+.tile{border:2px solid var(--line);border-radius:10px;background:var(--tint);padding:6px 4px;text-align:center;cursor:pointer;min-height:56px}
+.tile b{display:block;font:600 18px/1.1 "Barlow Semi Condensed",sans-serif}.tile small{font-size:12px;color:var(--mute);font-variant-numeric:tabular-nums}
+.tile.ok{border-color:var(--ok)}.tile.bad{border-color:var(--bad)}.tile.seq{border-color:var(--warn)}.tile.act{outline:3px solid var(--sel);outline-offset:1px}
+.photos{display:flex;gap:8px;overflow-x:auto}.photos figure{margin:0;flex:none;width:120px}.photos img{width:120px;height:90px;object-fit:cover;border-radius:8px;display:block;background:var(--tint)}.photos figcaption{font-size:12px;color:var(--mute)}
+textarea{width:100%;min-height:190px;font:14px/1.45 Barlow,sans-serif;padding:10px;border-radius:10px;border:1px solid var(--line);background:var(--tint);color:var(--ink);resize:vertical}
+input[type=text]{min-height:44px;padding:0 10px;border-radius:10px;border:1px solid var(--line);background:var(--tint);width:9em;font-size:16px}
+.log{margin:0;padding:0;list-style:none;font-size:13px;max-height:200px;overflow:auto}.log li{padding:4px 0;border-bottom:1px solid var(--line)}.log time{color:var(--mute);font-variant-numeric:tabular-nums;margin-right:6px}
+details summary{cursor:pointer;font-weight:600;min-height:32px}details p,details li{font-size:14px}details code{font-size:13px;overflow-wrap:anywhere}
+.hidden{display:none!important}
+@media (max-width:900px){main{display:block;height:auto}.vp{aspect-ratio:10/8;max-height:72vh;width:100%}.rail{border-left:0;overflow:visible}}
+@media (max-width:600px){.vp{aspect-ratio:4/5}.vp svg.ov{top:64px;bottom:92px;height:auto}.legend{font-size:12px;padding:6px 8px}.hud{font-size:13px;max-width:calc(100% - 150px);left:8px;top:8px;padding:6px 10px}.vpbtns{right:8px;top:8px}.vpbtns .btn{min-height:40px;padding:0 10px}.camnote,.toast{bottom:100px}}
+</style>
+</head>
+<body>
+<header class="top" id="top">
+  <h1 class="brand">TorqueTrace <small>prototype</small></h1>
+  <div class="task"><b>Refit access panel 571AB</b> · 12 bolts · 25.0 N·m ± 1.0 · tighten in numbered order</div>
+  <div class="chips" id="chips"></div>
+</header>
+<main>
+  <section class="vp" id="vp" aria-label="Camera view with panel overlay">
+    <video id="video" playsinline muted></video>
+    <svg class="ov" id="ov" viewBox="0 0 1000 700" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Access panel with 12 numbered bolts"></svg>
+    <canvas id="cv"></canvas>
+    <div class="cursor" id="cursor"></div>
+    <div class="hud" id="hud"></div>
+    <div class="vpbtns">
+      <button class="btn" id="camBtn">Start camera</button>
+      <button class="btn hidden" id="flipBtn">Flip camera</button>
+    </div>
+    <div class="camnote" id="camnote"></div>
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <div class="legend" aria-label="Gesture guide">
+      <span><b>Open palm, hold</b> gestures on/off</span><span><b>Point</b> select bolt</span><span><b>Swipe</b> next/prev bolt</span><span><b>Fist, hold</b> photo</span><span><b>Thumbs up, hold</b> finish task</span>
+    </div>
+  </section>
+  <aside class="rail">
+    <section class="card tools" id="toolCard"></section>
+    <section class="card" id="boltCard"></section>
+    <section class="card"><h2>All bolts <span id="blSum"></span></h2><div class="bl" id="bl"></div></section>
+    <section class="card" id="finishCard"></section>
+    <section class="card"><h2>Handover summary <span>template; AI version in stage 4</span></h2>
+      <div class="row"><button class="btn" id="hoBtn">Generate</button><button class="btn" id="copyBtn" disabled>Copy</button></div>
+      <textarea id="hoText" class="hidden" readonly aria-label="Handover summary"></textarea></section>
+    <section class="card"><h2>Evidence photos <span id="phSum">none yet</span></h2>
+      <div class="photos" id="photos"></div>
+      <div class="row" style="margin-top:8px"><button class="btn" id="photoBtn">Add photo</button></div></section>
+    <section class="card"><h2>Event log</h2><ul class="log" id="log"></ul></section>
+    <section class="card">
+      <details><summary>Run it on a tablet</summary>
+        <ol><li>Save this file as <code>index.html</code> and put it in a GitHub repository.</li>
+        <li>In the repository, open Settings → Pages and deploy from your main branch. You get an https link.</li>
+        <li>Open that link in Chrome on an Android tablet, tap Start camera and allow the camera. The gesture model downloads the first time.</li>
+        <li>Camera, gestures and Bluetooth do not run inside the Claude preview. Tapping, the simulated wrench and QR from a photo do.</li></ol></details>
+      <details><summary>What is simulated</summary>
+        <p>Wrench readings, the tool register, the staff badge scan and the panel position (the overlay is fixed on screen; a later version anchors it to markers on the real panel). Torque values and the bolt order are demo values, not from a maintenance manual.</p></details>
+      <details><summary>ESP32 wrench (stage 5)</summary>
+        <p>Advertise as <code>TT-TW0042</code> with the Nordic UART service <code>6e400001-b5a3-f393-e0a9-e50e24dcca9e</code>. Send lines on the TX characteristic: <code>TQ:25.3</code> for a reading and <code>ID:TW-0042</code> when asked with <code>ID?</code>. Switch the wrench mode to Bluetooth before connecting.</p></details>
+      <details><summary>Keyboard shortcuts</summary>
+        <p>T or Space: simulated pull · N / B: next / previous bolt · G: gestures on/off · P: photo · F: finish task</p></details>
+      <div class="row" style="margin-top:10px"><button class="btn" id="resetBtn">Reset task</button></div>
+    </section>
+  </aside>
+</main>
+<input type="file" id="qrFile" accept="image/*" capture="environment" class="hidden">
+<input type="file" id="phFile" accept="image/*" capture="environment" class="hidden">
+<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
+<script>
+{
+const $ = id => document.getElementById(id);
+const SPEC = {target:25.0, tol:1.0, unit:'N·m'};
+const TGT = SPEC.target.toFixed(1), TOL = SPEC.tol.toFixed(1);
+const POS = [[444,178],[444,522],[556,178],[556,522],[752,283],[248,283],[752,417],[248,417],[332,178],[668,522],[668,178],[332,522]];
+const REGISTER = {
+  'TW-0042':{id:'TW-0042',type:'Click torque wrench with smart adapter',min:5,max:60,cal:'2027-03-01'},
+  'TW-0043':{id:'TW-0043',type:'Click torque wrench with smart adapter',min:5,max:60,cal:'2026-10-15'},
+  'TW-0050':{id:'TW-0050',type:'Click torque wrench, large',min:40,max:200,cal:'2027-06-30'}
+};
+const MP = 'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@1.1.1';
+const MODEL = 'https://storage.googleapis.com/mediapipe-models/gesture_recognizer/gesture_recognizer/float16/1/gesture_recognizer.task';
+const NUS = '6e400001-b5a3-f393-e0a9-e50e24dcca9e', NUS_RX = '6e400002-b5a3-f393-e0a9-e50e24dcca9e', NUS_TX = '6e400003-b5a3-f393-e0a9-e50e24dcca9e';
+const KEY = 'torquetrace-proto-v1';
+const HOLD = {Open_Palm:1000, Closed_Fist:900, Thumb_Up:900};
+const LABEL = {Open_Palm:'Open palm', Closed_Fist:'Fist', Thumb_Up:'Thumbs up', Point:'Pointing', None:'Hand seen', Victory:'Victory', Thumb_Down:'Thumbs down', Pointing_Up:'Pointing up', ILoveYou:'Hand sign'};
+
+const fresh = () => ({bolts:POS.map((p,i)=>({n:i+1,status:'open',reading:null,kind:null,t:null,history:[]})),active:1,tool:null,toolState:'none',mode:'sim',outcome:'in',gestures:false,photos:[],log:[],finish:null,signed:null,tech:'T-1234'});
+let S = fresh();
+try { const saved = JSON.parse(localStorage.getItem(KEY)); if (saved && saved.bolts && saved.bolts.length === 12) { S = Object.assign(fresh(), saved); if (S.toolState === 'connected' || S.toolState === 'connecting') S.toolState = 'checked'; S.gestures = false; } } catch (e) {}
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} };
+
+const cam = {stream:null, facing:'environment', mirror:false};
+const G = {cand:null, t0:0, p0:null, fired:false, cool:0, hist:[], dwellB:null, dwellT:0, scanUntil:0};
+let rec = null, recState = 'idle', raf = 0, lastVT = -1, lastScan = 0, scanBusy = false, lastCode = '', lastCodeT = 0, ble = null, toastTimer = 0, resetArm = 0;
+
+const now = () => new Date();
+const hhmm = d => new Date(d).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+const fmtDate = s => new Date(s + 'T00:00:00').toLocaleDateString([], {day:'2-digit', month:'short', year:'numeric'});
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const bolt = n => S.bolts[n - 1];
+const nextExpected = () => { const b = S.bolts.find(b => b.status !== 'ok'); return b ? b.n : null; };
+const listNums = a => a.length ? a.join(', ') : 'none';
+
+function log(text){ S.log.unshift({t:Date.now(), text}); S.log = S.log.slice(0, 60); }
+function toast(text, kind){ const el = $('toast'); el.textContent = text; el.className = 'toast show ' + (kind || ''); clearTimeout(toastTimer); toastTimer = setTimeout(() => el.className = 'toast', 2800); }
+
+function buildOverlay(){
+  let skin = '<g class="skin">';
+  for (const y of [40, 660]) { skin += `<rect class="lap" x="-2000" y="${y-3}" width="5000" height="6"/>`; for (let x = -1990; x < 3000; x += 34) skin += `<circle class="rv" cx="${x}" cy="${y+16}" r="3.2"/><circle class="rvh" cx="${x-1}" cy="${y+15}" r="1.2"/>`; }
+  for (const x of [120, 880]) { for (let y = -1990; y < 2700; y += 34) skin += `<circle class="rv" cx="${x}" cy="${y}" r="3.2"/><circle class="rvh" cx="${x-1}" cy="${y-1}" r="1.2"/>`; }
+  skin += '</g>';
+  const bolts = POS.map(([x, y], i) => `<g class="bolt" data-n="${i+1}" transform="translate(${x} ${y})" role="button" aria-label="Bolt ${i+1}">
+    <circle class="sel" r="36"/><circle class="ring" r="26"/><circle class="head" r="16"/><path class="slot" d="M-8 0H8M0-8V8"/>
+    <g class="tag" transform="translate(26 -26)"><rect x="-14" y="-12" width="28" height="24" rx="6"/><text>${i+1}</text></g>
+    <g class="mk" transform="translate(-24 24)"><circle r="11"/><text class="mkt"></text></g></g>`).join('');
+  $('ov').innerHTML = skin + `<rect class="pnl" x="220" y="150" width="560" height="400" rx="18"/><rect class="pnl-in" x="234" y="164" width="532" height="372" rx="12"/>
+    <text class="stencil" x="500" y="368" text-anchor="middle">571AB</text><text class="plac" x="500" y="410" text-anchor="middle">Tighten in numbered order</text>` + bolts;
+  $('ov').querySelectorAll('.bolt').forEach(g => g.addEventListener('click', () => select(+g.dataset.n, 'tap')));
+}
+
+function toolChecks(t){
+  const today = new Date(); today.setHours(0,0,0,0);
+  const calOk = new Date(t.cal + 'T00:00:00') >= today;
+  const rangeOk = t.min <= SPEC.target - SPEC.tol && t.max >= SPEC.target + SPEC.tol;
+  return {calOk, rangeOk, ok: calOk && rangeOk};
+}
+
+function render(){
+  const done = S.bolts.filter(b => b.status === 'ok').length, nx = nextExpected();
+  const gs = rec ? (S.gestures ? 'acc' : '') : '';
+  $('chips').innerHTML = `<span class="chip ${cam.stream ? 'on' : ''}"><i></i>Camera ${cam.stream ? 'on' : 'off'}</span>
+    <span class="chip ${gs}"><i></i>Gestures ${S.gestures ? 'on' : 'off'}</span>
+    <span class="chip ${S.toolState === 'connected' ? 'on' : S.tool ? 'warn' : ''}"><i></i>${S.toolState === 'connected' ? S.tool.id + ' connected' : S.tool ? S.tool.id + ' not connected' : 'No tool'}</span>
+    <span class="chip ${S.signed ? 'on' : ''}"><i></i>${done}/12 in spec</span>`;
+  $('ov').querySelectorAll('.bolt').forEach(g => {
+    const b = bolt(+g.dataset.n);
+    g.setAttribute('class', `bolt s-${b.status}${S.active === b.n ? ' active' : ''}`);
+    g.querySelector('.mkt').textContent = b.status === 'ok' ? '✓' : b.status === 'bad' ? '✕' : b.status === 'seq' ? '!' : '';
+  });
+  renderTool(); renderBolt(nx); renderList(done); renderFinish(); renderPhotos();
+  $('log').innerHTML = S.log.slice(0, 30).map(l => `<li><time>${hhmm(l.t)}</time>${esc(l.text)}</li>`).join('') || '<li class="small">Nothing yet.</li>';
+  hud();
+  save();
+}
+
+function renderTool(){
+  const t = S.tool, c = $('toolCard');
+  const modeSeg = `<div class="seg" role="group" aria-label="Wrench mode"><button data-mode="sim" aria-pressed="${S.mode === 'sim'}">Simulated</button><button data-mode="ble" aria-pressed="${S.mode === 'ble'}">Bluetooth</button></div>`;
+  let html = `<h2>Tool <span>${S.toolState === 'connected' ? (S.mode === 'ble' ? 'Bluetooth' : 'simulated wrench') : 'scan the sticker on the wrench'}</span></h2>`;
+  if (!t) {
+    html += `<p class="muted" style="margin:0 0 10px">Scan the QR sticker (text <code>TT:TW-0042</code>) with the camera or from a photo.</p>
+      <div class="row"><button class="btn pri" id="scanCamBtn">Scan with camera</button><button class="btn" id="scanPhotoBtn">Scan from photo</button></div>
+      <div class="demo"><span class="small" style="align-self:center">No sticker? Try:</span><button class="btn" data-demo="TW-0042">TW-0042</button><button class="btn" data-demo="TW-0043">TW-0043</button><button class="btn" data-demo="TW-0050">TW-0050</button></div>`;
+  } else {
+    const k = toolChecks(t);
+    html += `<dl><dt>Tool</dt><dd><b>${t.id}</b> · ${esc(t.type)}</dd><dt>Range</dt><dd>${t.min}–${t.max} ${SPEC.unit}</dd><dt>Calibration due</dt><dd>${fmtDate(t.cal)}</dd></dl>
+      <div class="check ${k.calOk ? 'y' : 'n'}"><b>${k.calOk ? '✓' : '✕'}</b>${k.calOk ? 'Calibration in date' : 'Calibration overdue: do not use, return to tool store'}</div>
+      <div class="check ${k.rangeOk ? 'y' : 'n'}"><b>${k.rangeOk ? '✓' : '✕'}</b>${k.rangeOk ? `Range covers ${TGT} ± ${TOL} ${SPEC.unit}` : `Range does not cover ${TGT} ${SPEC.unit}: wrong wrench for this task`}</div>
+      <div class="row" style="margin-top:10px">`;
+    if (S.toolState === 'connected') html += `<span class="pill p-ok">Connected</span><button class="btn" id="discBtn">Disconnect</button>`;
+    else if (S.toolState === 'connecting') html += `<span class="pill p-open">Connecting…</span>`;
+    else html += `<button class="btn pri" id="connBtn" ${k.ok ? '' : 'disabled'}>Connect ${t.id}</button>`;
+    html += `<button class="btn" id="changeBtn">Change tool</button></div>`;
+    if (S.toolState !== 'connected') html += `<div class="row" style="margin-top:10px"><span class="small">Wrench mode</span>${modeSeg}</div>`;
+  }
+  c.innerHTML = html;
+  c.querySelectorAll('[data-demo]').forEach(b => b.onclick = () => handleCode('TT:' + b.dataset.demo, 'demo'));
+  c.querySelectorAll('[data-mode]').forEach(b => b.onclick = () => { S.mode = b.dataset.mode; render(); });
+  const on = (id, f) => { const el = $(id); if (el) el.onclick = f; };
+  on('scanCamBtn', scanWithCamera); on('scanPhotoBtn', () => $('qrFile').click());
+  on('connBtn', connect); on('discBtn', disconnect);
+  on('changeBtn', () => { disconnect(true); S.tool = null; S.toolState = 'none'; render(); });
+}
+
+function renderBolt(nx){
+  const b = S.active ? bolt(S.active) : null, c = $('boltCard');
+  if (!b) { c.innerHTML = `<h2>Bolts</h2><p class="msg ok">All 12 bolts torqued in spec. Finish the task below.</p>`; return; }
+  const st = {open:['p-open','Not torqued'], ok:['p-ok','In spec'], bad:['p-bad','Out of tolerance'], seq:['p-seq','Out of sequence']}[b.status];
+  const isNext = b.n === nx;
+  const ready = S.toolState === 'connected';
+  let note = '';
+  if (b.status === 'bad') note = `<p class="msg bad">${b.kind === 'over' ? `Over-torqued at ${b.reading.toFixed(1)} ${SPEC.unit}. Follow the task card's over-torque instructions before torquing again.` : `Under-torqued at ${b.reading.toFixed(1)} ${SPEC.unit}. Torque again to ${TGT} ${SPEC.unit}.`}</p>`;
+  else if (b.status === 'seq') note = `<p class="msg warn">Torqued before an earlier bolt. Re-check this bolt once the earlier ones are done.</p>`;
+  else if (!isNext && b.status === 'open' && nx) note = `<p class="msg warn">Bolt ${nx} comes first in the order.</p>`;
+  c.innerHTML = `<h2>Bolt ${b.n} <span>${isNext ? '<span class="pill p-next">Next in order</span>' : ''} <span class="pill ${st[0]}">${st[1]}</span></span></h2>
+    <div class="bolthead"><div><div class="big">${b.reading != null ? b.reading.toFixed(1) : '–'}<span style="font-size:20px"> ${SPEC.unit}</span></div>
+    <div class="small">${b.t ? 'Last reading ' + hhmm(b.t) + (b.history.length > 1 ? ` · ${b.history.length} readings` : '') : `Target ${TGT} ± ${TOL}`}</div></div>
+    <div class="row"><button class="btn" id="prevBtn" aria-label="Previous bolt">◀</button><button class="btn" id="nextBtn" aria-label="Next bolt">▶</button></div></div>
+    <div class="row"><button class="btn pri" id="pullBtn" ${ready ? '' : 'disabled'}>Simulate pull</button>
+    <div class="seg" role="group" aria-label="Simulated result"><button data-out="in" aria-pressed="${S.outcome === 'in'}">In spec</button><button data-out="under" aria-pressed="${S.outcome === 'under'}">Under</button><button data-out="over" aria-pressed="${S.outcome === 'over'}">Over</button></div></div>
+    ${ready ? '' : '<p class="small" style="margin:8px 0 0">Connect a tool first: readings only count from a checked, connected wrench.</p>'}${note}`;
+  $('pullBtn').onclick = simPull; $('prevBtn').onclick = () => step(-1); $('nextBtn').onclick = () => step(1);
+  c.querySelectorAll('[data-out]').forEach(x => x.onclick = () => { S.outcome = x.dataset.out; render(); });
+}
+
+function renderList(done){
+  $('blSum').textContent = `${done} of 12 in spec`;
+  $('bl').innerHTML = S.bolts.map(b => `<button class="tile ${b.status !== 'open' ? b.status : ''} ${S.active === b.n ? 'act' : ''}" data-n="${b.n}" aria-label="Bolt ${b.n}, ${b.status}"><b>${b.n}</b><small>${b.reading != null ? b.reading.toFixed(1) : '—'}</small></button>`).join('');
+  $('bl').querySelectorAll('.tile').forEach(t => t.onclick = () => select(+t.dataset.n, 'tap'));
+}
+
+function renderFinish(){
+  const c = $('finishCard');
+  let html = `<h2>Finish and sign off <span>thumbs up, hold</span></h2>`;
+  if (S.signed) html += `<p class="msg ok" style="margin-top:0">Signed off by <b>${esc(S.signed.tech)}</b> at ${hhmm(S.signed.t)}. Badge scan simulated; a real system uses the staff ID system.</p>`;
+  else if (S.finish && S.finish.ok) html += `<p class="msg ok" style="margin-top:0">All 12 bolts in spec. Scan your staff badge to sign off.</p>
+    <div class="row" style="margin-top:10px"><label class="small" for="techId">Staff ID</label><input type="text" id="techId" value="${esc(S.tech)}"><button class="btn pri" id="badgeBtn">Simulate badge scan</button></div>`;
+  else {
+    html += `<div class="row"><button class="btn pri" id="finBtn">Finish task</button></div>`;
+    if (S.finish) html += `<p class="msg bad">${esc(S.finish.text)}</p>`;
+  }
+  c.innerHTML = html;
+  if ($('finBtn')) $('finBtn').onclick = () => finish('tap');
+  if ($('badgeBtn')) $('badgeBtn').onclick = () => { S.tech = ($('techId').value || 'T-0000').trim(); S.signed = {tech:S.tech, t:Date.now()}; log(`Task signed off by ${S.tech} (badge scan simulated)`); toast('Task signed off', 'ok'); render(); };
+}
+
+function renderPhotos(){
+  $('phSum').textContent = S.photos.length ? `${S.photos.length} saved` : 'none yet';
+  $('photos').innerHTML = S.photos.map(p => `<figure><img src="${p.src}" alt="Evidence photo for bolt ${p.bolt}"><figcaption>Bolt ${p.bolt} · ${hhmm(p.t)}</figcaption></figure>`).join('');
+}
+
+function hud(label, prog){
+  const el = $('hud');
+  if (!cam.stream) { el.innerHTML = `<b>Camera off.</b> Tap bolts, or start the camera for gestures.`; return; }
+  if (recState === 'loading') { el.innerHTML = `<b>Loading gesture model…</b>`; return; }
+  if (recState === 'failed') { el.innerHTML = `<b>Gestures unavailable.</b> The model could not load; tapping still works.`; return; }
+  const scanning = needScan() ? ' · scanning for tool QR' : '';
+  const name = label ? (LABEL[label] || label) : 'No hand';
+  el.innerHTML = `<b>Gestures ${S.gestures ? 'on' : 'off'}</b>${scanning}<br>${S.gestures || label === 'Open_Palm' ? name : 'Show an open palm and hold to turn gestures on'}${prog ? `<div class="bar"><i style="width:${Math.round(prog * 100)}%"></i></div>` : ''}`;
+}
+
+function select(n, via){
+  if (S.signed) { toast('Task already signed off'); return; }
+  S.active = n;
+  if (via === 'gesture') log(`Bolt ${n} selected by pointing`);
+  render();
+}
+function step(d){ const n = ((S.active || 1) - 1 + d + 12) % 12 + 1; select(n); toast(`Bolt ${n} selected`); }
+
+function onTorque(v, source){
+  if (S.toolState !== 'connected') { toast('No connected tool: reading ignored', 'warn'); return; }
+  if (S.signed) { toast('Task already signed off'); return; }
+  const n = S.active || nextExpected();
+  if (!n) { toast('All bolts already in spec'); return; }
+  const b = bolt(n), val = Math.round(v * 10) / 10;
+  const inTol = Math.abs(val - SPEC.target) <= SPEC.tol + 1e-9;
+  const earlier = S.bolts.filter(x => x.n < n && x.status !== 'ok').map(x => x.n);
+  b.kind = val > SPEC.target ? 'over' : 'under';
+  b.status = !inTol ? 'bad' : earlier.length ? 'seq' : 'ok';
+  b.reading = val; b.t = Date.now(); b.history.push({v:val, t:b.t, status:b.status});
+  S.finish = null;
+  const src = source === 'wrench' ? 'wrench' : 'simulated';
+  if (b.status === 'ok') { log(`Bolt ${n}: ${val.toFixed(1)} ${SPEC.unit} in spec (${src})`); toast(`Bolt ${n}: ${val.toFixed(1)} ${SPEC.unit} ✓`, 'ok'); S.active = nextExpected(); }
+  else if (b.status === 'bad') { log(`Bolt ${n}: ${val.toFixed(1)} ${SPEC.unit} OUT OF TOLERANCE, ${b.kind} (${src})`); toast(`Bolt ${n}: ${val.toFixed(1)} ${SPEC.unit}, ${b.kind}-torqued`, 'bad'); }
+  else { log(`Bolt ${n}: ${val.toFixed(1)} ${SPEC.unit} out of sequence, bolts ${listNums(earlier)} not done (${src})`); toast(`Bolt ${n} done out of order: go back to bolt ${earlier[0]}`, 'warn'); S.active = earlier[0]; }
+  render();
+}
+
+function simPull(){
+  const r = Math.random();
+  const v = S.outcome === 'over' ? 26.4 + r * 1.4 : S.outcome === 'under' ? 22.2 + r * 1.2 : 24.4 + r * 1.2;
+  onTorque(v, 'sim');
+  const pb = $('pullBtn'); if (pb) { pb.disabled = true; setTimeout(() => { const p = $('pullBtn'); if (p && S.toolState === 'connected') p.disabled = false; }, 450); }
+}
+
+function finish(via){
+  if (S.signed) { toast('Already signed off'); return; }
+  const open = S.bolts.filter(b => b.status === 'open').map(b => b.n);
+  const bad = S.bolts.filter(b => b.status === 'bad').map(b => b.n);
+  const seq = S.bolts.filter(b => b.status === 'seq').map(b => b.n);
+  if (open.length || bad.length || seq.length) {
+    const parts = [];
+    if (open.length) parts.push(`not torqued: ${listNums(open)}`);
+    if (bad.length) parts.push(`out of tolerance: ${listNums(bad)}`);
+    if (seq.length) parts.push(`out of sequence, re-check: ${listNums(seq)}`);
+    S.finish = {ok:false, text:`Can't finish yet. Bolts ${parts.join('; ')}.`};
+    log(`Finish blocked (${via}): ${parts.join('; ')}`); toast('Not finished: bolts still open', 'bad');
+  } else { S.finish = {ok:true}; log(`All bolts in spec; finish confirmed (${via}). Waiting for sign-off.`); toast('All bolts in spec: scan badge to sign off', 'ok'); }
+  render();
+}
+
+function handover(){
+  const d = new Date(), t = S.tool;
+  const ok = S.bolts.filter(b => b.status === 'ok').length;
+  const open = S.bolts.filter(b => b.status === 'open').map(b => b.n);
+  const bad = S.bolts.filter(b => b.status === 'bad');
+  const seq = S.bolts.filter(b => b.status === 'seq');
+  const nx = nextExpected();
+  const L = [`HANDOVER: Refit access panel 571AB (demo task)`,
+    `${d.toLocaleDateString([], {day:'2-digit', month:'short', year:'numeric'})} ${hhmm(d)} · Staff ${S.tech}` + (t ? ` · Tool ${t.id}, calibration due ${fmtDate(t.cal)}` : ' · No tool scanned'),
+    ``, `Progress: ${ok} of 12 bolts torqued in spec (${TGT} ± ${TOL} ${SPEC.unit}).`];
+  if (open.length) L.push(`Not torqued: bolts ${listNums(open)}.`);
+  bad.forEach(b => L.push(`Out of tolerance: bolt ${b.n} at ${b.reading.toFixed(1)} ${SPEC.unit} (${b.kind}). Follow the task card before re-torquing.`));
+  seq.forEach(b => L.push(`Out of sequence: bolt ${b.n} at ${b.reading.toFixed(1)} ${SPEC.unit}. Re-check after earlier bolts.`));
+  if (S.photos.length) L.push(`Photos: ${S.photos.length} (bolts ${[...new Set(S.photos.map(p => p.bolt))].join(', ')}).`);
+  L.push(S.signed ? `Signed off by ${S.signed.tech} at ${hhmm(S.signed.t)}.` : nx ? `Next shift: continue from bolt ${nx} in the numbered order.` : `All bolts in spec: ready for sign-off.`);
+  return L.join('\n');
+}
+
+function addPhoto(src){ S.photos.unshift({src, bolt:S.active || nextExpected() || 12, t:Date.now()}); S.photos = S.photos.slice(0, 8); log(`Evidence photo taken for bolt ${S.photos[0].bolt}`); toast(`Photo saved for bolt ${S.photos[0].bolt}`, 'ok'); render(); }
+function shrink(source, w, h, max){ const s = Math.min(1, max / Math.max(w, h)); const c = document.createElement('canvas'); c.width = Math.round(w * s); c.height = Math.round(h * s); c.getContext('2d').drawImage(source, 0, 0, c.width, c.height); return c; }
+function takePhoto(){
+  const v = $('video');
+  if (cam.stream && v.videoWidth) addPhoto(shrink(v, v.videoWidth, v.videoHeight, 360).toDataURL('image/jpeg', .7));
+  else $('phFile').click();
+}
+
+async function loadImage(file){ const url = URL.createObjectURL(file); try { const img = new Image(); img.src = url; await img.decode(); return img; } finally { setTimeout(() => URL.revokeObjectURL(url), 1000); } }
+
+function handleCode(text, via){
+  const m = /^TT[:\s-]*([A-Z]{2})-?(\d{4})$/i.exec(String(text).trim());
+  if (!m) { if (via !== 'camera') toast('Not a TorqueTrace tool code', 'warn'); return; }
+  const id = (m[1] + '-' + m[2]).toUpperCase(), t = REGISTER[id];
+  if (!t) { toast(`${id} is not in the tool register`, 'bad'); log(`Scanned ${id}: not in tool register`); render(); return; }
+  if (S.tool && S.tool.id === id) return;
+  disconnect(true);
+  S.tool = t; S.toolState = 'checked'; G.scanUntil = 0;
+  const k = toolChecks(t);
+  log(`Scanned ${id} (${via}): ${k.calOk ? 'calibration in date' : 'CALIBRATION OVERDUE'}, ${k.rangeOk ? 'range OK' : 'WRONG RANGE'}`);
+  toast(k.ok ? `${id} checked: tap Connect` : `${id} failed checks`, k.ok ? 'ok' : 'bad');
+  render();
+}
+
+async function decodeSource(src, w, h){
+  if ('BarcodeDetector' in window) { try { const det = new BarcodeDetector({formats:['qr_code']}); const r = await det.detect(src); if (r.length) return r[0].rawValue; } catch (e) {} }
+  if (window.jsQR) { const c = shrink(src, w, h, 900); const ctx = c.getContext('2d'); const d = ctx.getImageData(0, 0, c.width, c.height); const r = window.jsQR(d.data, c.width, c.height, {inversionAttempts:'attemptBoth'}); if (r) return r.data; }
+  return null;
+}
+
+$('qrFile').onchange = async e => {
+  const f = e.target.files[0]; e.target.value = ''; if (!f) return;
+  try { const img = await loadImage(f); const code = await decodeSource(img, img.naturalWidth, img.naturalHeight); if (code) handleCode(code, 'photo'); else toast('No QR code found in that photo', 'warn'); }
+  catch (err) { toast('Could not read that image', 'bad'); }
+};
+$('phFile').onchange = async e => {
+  const f = e.target.files[0]; e.target.value = ''; if (!f) return;
+  try { const img = await loadImage(f); addPhoto(shrink(img, img.naturalWidth, img.naturalHeight, 360).toDataURL('image/jpeg', .7)); } catch (err) { toast('Could not read that image', 'bad'); }
+};
+
+const needScan = () => !!cam.stream && (!S.tool || performance.now() < G.scanUntil);
+function scanWithCamera(){ G.scanUntil = performance.now() + 20000; if (!cam.stream) startCamera(); else toast('Hold the sticker up to the camera'); hud(); }
+async function scanFrame(){
+  const v = $('video'); if (scanBusy || !v.videoWidth) return; scanBusy = true;
+  try { const code = await decodeSource(v, v.videoWidth, v.videoHeight); if (code && (code !== lastCode || Date.now() - lastCodeT > 4000)) { lastCode = code; lastCodeT = Date.now(); handleCode(code, 'camera'); } }
+  finally { scanBusy = false; }
+}
+
+async function connect(){
+  if (!S.tool || !toolChecks(S.tool).ok) return;
+  if (S.mode === 'sim') {
+    S.toolState = 'connecting'; render();
+    setTimeout(() => { if (S.toolState !== 'connecting') return; S.toolState = 'connected'; log(`${S.tool.id} connected (simulated wrench)`); toast(`${S.tool.id} connected`, 'ok'); render(); }, 700);
+    return;
+  }
+  if (!navigator.bluetooth) { toast('Bluetooth needs Chrome on Android over https', 'warn'); log('Bluetooth not available in this browser'); render(); return; }
+  const name = 'TT-' + S.tool.id.replace('-', '');
+  try {
+    S.toolState = 'connecting'; render();
+    const dev = await navigator.bluetooth.requestDevice({filters:[{name}], optionalServices:[NUS]});
+    const server = await dev.gatt.connect();
+    const svc = await server.getPrimaryService(NUS);
+    const tx = await svc.getCharacteristic(NUS_TX);
+    await tx.startNotifications();
+    let buf = '';
+    tx.addEventListener('characteristicvaluechanged', e => { buf += new TextDecoder().decode(e.target.value); let i; while ((i = buf.indexOf('\n')) >= 0) { onLine(buf.slice(0, i).trim()); buf = buf.slice(i + 1); } });
+    dev.addEventListener('gattserverdisconnected', () => { if (ble && ble.dev === dev) { ble = null; if (S.toolState === 'connected') { S.toolState = 'checked'; log(`${S.tool ? S.tool.id : 'Wrench'} disconnected`); toast('Wrench disconnected', 'warn'); render(); } } });
+    ble = {dev};
+    S.toolState = 'connected'; log(`${S.tool.id} connected over Bluetooth (${name})`); toast(`${S.tool.id} connected`, 'ok'); render();
+    try { const rx = await svc.getCharacteristic(NUS_RX); await rx.writeValue(new TextEncoder().encode('ID?\n')); } catch (e) {}
+  } catch (err) {
+    S.toolState = 'checked'; render();
+    toast(err && err.name === 'NotFoundError' ? 'No wrench chosen' : 'Bluetooth connection failed', 'warn');
+    log(`Bluetooth connect failed: ${err && err.message ? err.message : err}`); render();
+  }
+}
+function onLine(line){
+  if (line.startsWith('TQ:')) { const v = parseFloat(line.slice(3)); if (isFinite(v)) onTorque(v, 'wrench'); }
+  else if (line.startsWith('ID:')) { const id = line.slice(3).trim(); if (S.tool && id !== S.tool.id) { log(`Wrench reports ${id}, sticker says ${S.tool.id}: disconnected`); toast('Sticker and wrench do not match', 'bad'); disconnect(); } else log(`Wrench confirmed its ID: ${id}`); render(); }
+}
+function disconnect(quiet){
+  if (ble && ble.dev && ble.dev.gatt.connected) { try { ble.dev.gatt.disconnect(); } catch (e) {} }
+  ble = null;
+  if (S.toolState === 'connected' || S.toolState === 'connecting') { S.toolState = S.tool ? 'checked' : 'none'; if (!quiet) { log(`${S.tool ? S.tool.id : 'Tool'} disconnected`); render(); } }
+}
+
+async function startCamera(){
+  const note = $('camnote');
+  note.classList.remove('show');
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { showCamNote(); return; }
+  try {
+    cam.stream = await navigator.mediaDevices.getUserMedia({video:{facingMode:cam.facing, width:{ideal:1280}, height:{ideal:720}}, audio:false});
+  } catch (err) { cam.stream = null; showCamNote(err); return; }
+  const v = $('video'); v.srcObject = cam.stream; try { await v.play(); } catch (e) {}
+  const s = cam.stream.getVideoTracks()[0].getSettings();
+  cam.mirror = s.facingMode ? s.facingMode === 'user' : cam.facing === 'user';
+  $('vp').classList.add('live'); $('vp').classList.toggle('mirror', cam.mirror);
+  $('camBtn').textContent = 'Stop camera'; $('flipBtn').classList.remove('hidden');
+  log('Camera started'); render();
+  cancelAnimationFrame(raf); raf = requestAnimationFrame(loop);
+  if (!rec && recState !== 'loading') loadRecognizer();
+}
+function showCamNote(err){
+  const framed = window.self !== window.top;
+  $('camnote').innerHTML = framed ? '<b>The camera is blocked in this preview.</b> Host the file on https and open it in Chrome on your tablet (see "Run it on a tablet"). Tapping, the simulated wrench and QR from a photo work here.' : `<b>Camera not available.</b> ${err && err.name === 'NotAllowedError' ? 'Allow camera access in the browser settings.' : 'Open the page over https in Chrome.'} You can still tap bolts and scan QR from a photo.`;
+  $('camnote').classList.add('show'); setTimeout(() => $('camnote').classList.remove('show'), 9000);
+  render();
+}
+function stopCamera(){
+  if (cam.stream) cam.stream.getTracks().forEach(t => t.stop());
+  cam.stream = null; cancelAnimationFrame(raf);
+  $('vp').classList.remove('live', 'mirror'); $('camBtn').textContent = 'Start camera'; $('flipBtn').classList.add('hidden');
+  $('cursor').style.display = 'none'; clearCanvas(); S.gestures = false; log('Camera stopped'); render();
+}
+async function loadRecognizer(){
+  recState = 'loading'; hud();
+  try {
+    const {FilesetResolver, GestureRecognizer} = await import(MP + '/vision_bundle.mjs');
+    const files = await FilesetResolver.forVisionTasks(MP + '/wasm');
+    const opts = d => ({baseOptions:{modelAssetPath:MODEL, delegate:d}, runningMode:'VIDEO', numHands:1, minHandDetectionConfidence:.5, minHandPresenceConfidence:.5, minTrackingConfidence:.5});
+    try { rec = await GestureRecognizer.createFromOptions(files, opts('GPU')); } catch (e) { rec = await GestureRecognizer.createFromOptions(files, opts('CPU')); }
+    recState = 'ready'; log('Gesture model ready');
+  } catch (err) { recState = 'failed'; log('Gesture model failed to load'); }
+  render();
+}
+
+function loop(){
+  if (!cam.stream) return;
+  const t = performance.now(), v = $('video');
+  if (rec && v.readyState >= 2 && v.currentTime !== lastVT) {
+    lastVT = v.currentTime;
+    let r = null; try { r = rec.recognizeForVideo(v, t); } catch (e) {}
+    const lm = r && r.landmarks && r.landmarks[0];
+    const g = r && r.gestures && r.gestures[0] && r.gestures[0][0];
+    handleHand(lm ? (g && g.score >= .6 ? g.categoryName : 'None') : null, lm, t);
+    drawHand(lm);
+  }
+  if (needScan() && t - lastScan > 450) { lastScan = t; scanFrame(); }
+  raf = requestAnimationFrame(loop);
+}
+
+function toLocal(p){
+  const vp = $('vp'), v = $('video'), W = vp.clientWidth, H = vp.clientHeight;
+  const vw = v.videoWidth || W, vh = v.videoHeight || H, s = Math.max(W / vw, H / vh), dw = vw * s, dh = vh * s;
+  return {x:(cam.mirror ? 1 - p.x : p.x) * dw + (W - dw) / 2, y:p.y * dh + (H - dh) / 2};
+}
+function isPointing(lm){
+  const d = (a, b) => Math.hypot(lm[a].x - lm[b].x, lm[a].y - lm[b].y);
+  const ext = (tip, pip) => d(tip, 0) > d(pip, 0) * 1.12;
+  return ext(8, 6) && !ext(12, 10) && !ext(16, 14) && !ext(20, 18);
+}
+function boltAt(x, y){
+  const r0 = $('vp').getBoundingClientRect(); let best = null, bd = 1e9;
+  $('ov').querySelectorAll('.bolt').forEach(g => { const r = g.querySelector('.ring').getBoundingClientRect(); const cx = r.left - r0.left + r.width / 2, cy = r.top - r0.top + r.height / 2; const dist = Math.hypot(x - cx, y - cy); if (dist < Math.max(r.width * .85, 30) && dist < bd) { bd = dist; best = +g.dataset.n; } });
+  return best;
+}
+function handleHand(label, lm, t){
+  const cur = $('cursor');
+  if (!lm) { G.cand = null; G.hist = []; G.dwellB = null; cur.style.display = 'none'; hud(); return; }
+  const pts = lm.map(toLocal), W = $('vp').clientWidth;
+  let L = isPointing(lm) ? 'Point' : label;
+  G.hist.push({t, x:pts[0].x}); while (G.hist.length && t - G.hist[0].t > 500) G.hist.shift();
+  if (S.gestures && t > G.cool && L !== 'Point' && G.hist.length > 3) {
+    const dx = pts[0].x - G.hist[0].x;
+    if (Math.abs(dx) > W * .28) { G.cool = t + 900; G.hist = []; G.cand = null; step(dx > 0 ? 1 : -1); log(`Swipe ${dx > 0 ? 'right' : 'left'}: bolt ${S.active}`); render(); return; }
+  }
+  if (S.gestures && L === 'Point') {
+    const tip = pts[8], b = boltAt(tip.x, tip.y);
+    cur.style.display = 'block'; cur.style.left = tip.x + 'px'; cur.style.top = tip.y + 'px';
+    if (b !== G.dwellB) { G.dwellB = b; G.dwellT = t; }
+    const p = b && b !== S.active ? Math.min(1, (t - G.dwellT) / 600) : 0;
+    cur.style.setProperty('--p', p);
+    if (b && b !== S.active && p >= 1) select(b, 'gesture');
+  } else { cur.style.display = 'none'; G.dwellB = null; }
+  if (!(L in HOLD) || (!S.gestures && L !== 'Open_Palm')) { G.cand = null; hud(L); return; }
+  if (G.cand !== L) { G.cand = L; G.t0 = t; G.p0 = pts[0]; G.fired = false; }
+  if (L === 'Open_Palm' && Math.hypot(pts[0].x - G.p0.x, pts[0].y - G.p0.y) > W * .06) { G.t0 = t; G.p0 = pts[0]; }
+  const prog = Math.min(1, (t - G.t0) / HOLD[L]);
+  if (prog >= 1 && !G.fired && t > G.cool) { G.fired = true; G.cool = t + 1200; fire(L); }
+  hud(L, G.fired ? 0 : prog);
+}
+function fire(L){
+  if (L === 'Open_Palm') { S.gestures = !S.gestures; log(`Gestures turned ${S.gestures ? 'on' : 'off'} (open palm)`); toast(`Gestures ${S.gestures ? 'on' : 'off'}`, S.gestures ? 'ok' : ''); render(); }
+  else if (L === 'Closed_Fist') takePhoto();
+  else if (L === 'Thumb_Up') finish('thumbs up');
+}
+const CONN = [[0,1],[1,2],[2,3],[3,4],[0,5],[5,6],[6,7],[7,8],[5,9],[9,10],[10,11],[11,12],[9,13],[13,14],[14,15],[15,16],[13,17],[0,17],[17,18],[18,19],[19,20]];
+function clearCanvas(){ const c = $('cv'); c.getContext('2d').clearRect(0, 0, c.width, c.height); }
+function drawHand(lm){
+  const c = $('cv'), vp = $('vp'), dpr = window.devicePixelRatio || 1, W = vp.clientWidth, H = vp.clientHeight;
+  if (c.width !== Math.round(W * dpr) || c.height !== Math.round(H * dpr)) { c.width = Math.round(W * dpr); c.height = Math.round(H * dpr); }
+  const x = c.getContext('2d'); x.setTransform(dpr, 0, 0, dpr, 0, 0); x.clearRect(0, 0, W, H);
+  if (!lm) return;
+  const p = lm.map(toLocal), col = S.gestures ? '#c4d33b' : 'rgba(255,255,255,.75)';
+  x.lineWidth = 3; x.strokeStyle = col; x.beginPath(); CONN.forEach(([a, b]) => { x.moveTo(p[a].x, p[a].y); x.lineTo(p[b].x, p[b].y); }); x.stroke();
+  x.fillStyle = '#fff'; p.forEach(q => { x.beginPath(); x.arc(q.x, q.y, 3.5, 0, 7); x.fill(); });
+}
+
+$('camBtn').onclick = () => cam.stream ? stopCamera() : startCamera();
+$('flipBtn').onclick = () => { cam.facing = cam.facing === 'user' ? 'environment' : 'user'; if (cam.stream) { cam.stream.getTracks().forEach(t => t.stop()); cam.stream = null; } startCamera(); };
+$('photoBtn').onclick = takePhoto;
+$('hoBtn').onclick = () => { const ta = $('hoText'); ta.value = handover(); ta.classList.remove('hidden'); $('copyBtn').disabled = false; log('Handover summary generated'); render(); };
+$('copyBtn').onclick = async () => { const ta = $('hoText'); try { await navigator.clipboard.writeText(ta.value); toast('Summary copied', 'ok'); } catch (e) { ta.focus(); ta.select(); toast('Press copy on your keyboard or menu'); } };
+$('resetBtn').onclick = () => { const b = $('resetBtn'); if (Date.now() < resetArm) { disconnect(true); const keepMode = S.mode; S = fresh(); S.mode = keepMode; $('hoText').classList.add('hidden'); $('copyBtn').disabled = true; log('Task reset'); toast('Task reset'); b.textContent = 'Reset task'; resetArm = 0; render(); } else { resetArm = Date.now() + 3000; b.textContent = 'Tap again to reset'; setTimeout(() => { if (Date.now() >= resetArm) b.textContent = 'Reset task'; }, 3100); } };
+document.addEventListener('keydown', e => {
+  if (e.target.matches('input,textarea,select') || e.metaKey || e.ctrlKey || e.altKey) return;
+  const k = e.key.toLowerCase();
+  if (k === 't' || k === ' ') { e.preventDefault(); if (S.toolState === 'connected') simPull(); else toast('Connect a tool first', 'warn'); }
+  else if (k === 'n') step(1); else if (k === 'b') step(-1);
+  else if (k === 'g') { S.gestures = !S.gestures; log(`Gestures turned ${S.gestures ? 'on' : 'off'} (keyboard)`); render(); }
+  else if (k === 'p') takePhoto(); else if (k === 'f') finish('keyboard');
+});
+const setTop = () => document.documentElement.style.setProperty('--toph', $('top').offsetHeight + 'px');
+const topObs = new ResizeObserver(setTop); topObs.observe($('top'));
+
+buildOverlay(); setTop();
+if (!S.log.length) log('Task opened: refit access panel 571AB');
+render();
+window.__tt = {S:() => S, handleCode, onTorque, handleHand, fire, finish, handover};
+}
+</script>
+</body>
+</html>
