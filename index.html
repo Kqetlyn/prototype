@@ -139,11 +139,33 @@ details summary{cursor:pointer;font-weight:600;min-height:32px}details p,details
 .hidden{display:none!important}
 @media (max-width:900px){main{display:block;height:auto}.vp{aspect-ratio:10/8;max-height:72vh;width:100%}.rail{border-left:0;overflow:visible}}
 @media (max-width:600px){.vp{aspect-ratio:4/5}.vp svg.ov{top:64px;bottom:140px;height:auto}.legend{font-size:12px;padding:6px 8px}.tl{left:8px;top:8px;max-width:calc(100% - 140px)}.hud{font-size:13px;padding:6px 10px}.vpbtns{right:8px;top:8px;max-width:130px}.vpbtns .btn{min-height:38px;padding:0 10px;font-size:14px}.camnote{bottom:150px}.manualPanel{left:8px;right:8px;width:auto;top:56px;bottom:150px}.manualbar{font-size:13px}.tiles{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+.t3d{position:absolute;inset:0;z-index:7;background:radial-gradient(ellipse at 50% 38%,#36414a 0%,#161b1f 75%);touch-action:none}
+.vp.live .t3d{background:rgba(8,10,12,.35)}
+.vp.t3on .ov,.vp.t3on .legend,.vp.t3on .manualbar,.vp.t3on .whatbox{visibility:hidden}
+.vp .t3d canvas{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none;pointer-events:auto}
+.t3dbar{position:absolute;left:12px;right:12px;top:12px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;pointer-events:none}
+.t3dbar>*{pointer-events:auto}
+.t3dbar .ttl{margin-right:auto;color:#fff;font-weight:700;background:rgba(15,18,20,.78);padding:9px 12px;border-radius:10px}
+.t3dbar .btn,.t3dinfo .btn,.xro .btn{background:rgba(15,18,20,.85);color:#fff;border-color:rgba(255,255,255,.3)}
+.t3dinfo,.xrinfo{position:absolute;left:12px;bottom:12px;width:min(380px,calc(100% - 24px));max-height:58%;overflow:auto;background:rgba(15,18,20,.9);color:#fff;border-radius:12px;padding:12px 14px;font-size:14px;line-height:1.4}
+.t3dinfo h3,.xrinfo h3{margin:0 0 4px;font-size:16px}.t3dinfo p,.xrinfo p{margin:4px 0}.t3dinfo ul,.xrinfo ul{margin:6px 0;padding-left:18px}
+.t3dinfo .mut,.xrinfo .mut{color:#b8c0c4}.warn3{color:#d9c8ff;font-weight:600}
+.t3dhint{position:absolute;right:12px;bottom:12px;width:min(260px,38%);color:#fff;background:rgba(15,18,20,.75);border-radius:10px;padding:8px 10px;font-size:13px;line-height:1.35}
+@media (max-width:600px){.t3dhint{display:none}.t3dinfo{max-height:42%;font-size:13px;padding:10px 12px}.t3dbar .ttl{display:none}}
+.xro{display:none}
+.xro.on{display:block;position:fixed;inset:0;pointer-events:none;color:#fff;font:15px/1.4 system-ui,sans-serif}
+.xrbar{position:absolute;left:12px;right:12px;top:12px;display:flex;gap:8px;align-items:center;pointer-events:auto}
+.xrbar span{flex:1;background:rgba(15,18,20,.8);padding:10px 12px;border-radius:10px}
+.xro .xrinfo{pointer-events:auto}
+#cvW{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.whatbox{position:absolute;left:50%;transform:translateX(-50%);top:62px;width:min(440px,calc(100% - 24px));z-index:5;background:rgba(15,18,20,.9);color:#fff;border-radius:12px;padding:10px 14px;display:grid;gap:3px;font-size:14px;line-height:1.4}
+.whatbox b{font-size:16px}.whatbox .sm{color:#d7e47a}
 </style>
 </head>
 <body>
 <header class="top" id="top">
-  <h1 class="brand">TorqueTrace <small>prototype v3</small></h1>
+  <h1 class="brand">TorqueTrace <small>prototype v4</small></h1>
   <div class="task"><b>Refit access panel 571AB</b> · 9V-ZZC · 12 self-locking anchor nuts · 25.0 N·m ± 1.0 plus running torque · critical task (demo)</div>
   <div class="chips" id="chips"></div>
 </header>
@@ -152,15 +174,25 @@ details summary{cursor:pointer;font-weight:600;min-height:32px}details p,details
     <video id="video" playsinline muted></video>
     <svg class="ov" id="ov" viewBox="0 0 1000 700" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Access panel with 12 numbered bolts"></svg>
     <canvas id="cv"></canvas>
+    <canvas id="cvW"></canvas>
     <div class="cursor" id="cursor"></div>
     <div class="tl"><div class="hud" id="hud"></div><div id="alerts" style="display:grid;gap:4px" role="status" aria-live="polite"></div></div>
     <div class="vpbtns">
       <button class="btn" id="camBtn">Start camera</button>
       <button class="btn hidden" id="flipBtn">Flip camera</button>
       <button class="btn" id="twinBtn" aria-pressed="false">Twin view</button>
+      <button class="btn" id="twin3dBtn" aria-pressed="false">3D twin</button>
+      <button class="btn" id="whatBtn" aria-pressed="false">What's this?</button>
     </div>
     <div class="camnote" id="camnote"></div>
     <div class="manualPanel hidden" id="manualPanel" aria-label="AR task card manual"></div>
+    <div class="whatbox hidden" id="whatBox" role="status" aria-live="polite"></div>
+    <div class="t3d hidden" id="t3d" aria-label="3D digital twin of panel 571AB">
+      <canvas id="t3dCanvas" aria-label="3D model of the panel: drag to turn, tap a bolt"></canvas>
+      <div class="t3dbar"><span class="ttl">3D twin · panel 571AB</span><button class="btn" id="xrBtn">Place in room (AR)</button><button class="btn" id="t3dClose">Close 3D</button></div>
+      <div class="t3dinfo hidden" id="t3dInfo" role="status" aria-live="polite"></div>
+      <div class="t3dhint" id="t3dHint"></div>
+    </div>
     <div class="bottom"><div class="toast" id="toast" role="status" aria-live="polite"></div>
       <div class="manualbar" id="manualbar"></div>
       <div class="legend" aria-label="Gesture guide"><span><b>Open palm, hold</b> gestures on/off</span><span><b>Point</b> select bolt</span><span><b>Swipe</b> next/prev</span><span><b>Victory, hold</b> manual</span><span><b>OK sign, hold</b> confirm</span><span><b>Thumbs up, hold</b> finish</span></div></div>
@@ -208,11 +240,12 @@ details summary{cursor:pointer;font-weight:600;min-height:32px}details p,details
       <details><summary>ESP32 wrench (stage 5)</summary>
         <p>Advertise as <code>TT-TW0042</code> with the Nordic UART service <code>6e400001-b5a3-f393-e0a9-e50e24dcca9e</code>. Send lines on the TX characteristic: <code>LV:12.4</code> live torque samples, <code>RT:2.6</code> running torque, <code>TQ:27.8</code> peak torque at the wrench drive, <code>BT:84</code> battery %, <code>EV:DROP</code> and <code>EV:OVER</code> from the motion sensor, and <code>ID:TW-0042</code> when asked with <code>ID?</code>. With a crowfoot fitted in line, the app converts the drive reading to torque at the fastener.</p></details>
       <details><summary>Keyboard shortcuts</summary>
-        <p>T or Space: simulated pull · N / B: next / previous bolt · G: gestures on/off · M: manual · P: photo · F: finish · O: inspector confirms bolt</p><p>Extra gestures: fist, hold = evidence photo · two hands with fingers up = jump to that bolt number.</p></details>
+        <p>T or Space: simulated pull · N / B: next / previous bolt · G: gestures on/off · M: manual · P: photo · F: finish · O: inspector confirms bolt</p><p>Extra gestures: fist, hold = evidence photo · two hands with fingers up = jump to that bolt number.</p><p>3D twin: drag to turn, pinch to zoom, tap a bolt for its history; with gestures on, pinch your fingers and move to turn, two hands apart to zoom. "Place in room" puts the twin on a table (Chrome on ARCore Android). What's this?: point the camera at a part. Keys: 3 = 3D twin, W = What's this?</p></details>
       <div class="row" style="margin-top:10px"><button class="btn" id="resetBtn">Reset task</button></div>
     </section>
   </aside>
 </main>
+<div class="xro" id="xro"><div class="xrbar"><span id="xrMsg"></span><button class="btn" id="xrExit">Exit AR</button></div><div class="xrinfo hidden" id="xrInfo" role="status" aria-live="polite"></div></div>
 <input type="file" id="qrFile" accept="image/*" capture="environment" class="hidden">
 <input type="file" id="phFile" accept="image/*" capture="environment" class="hidden">
 <input type="file" id="stFile" accept="image/*" capture="environment" class="hidden">
@@ -981,7 +1014,9 @@ function stopCamera(){
   if (cam.stream) cam.stream.getTracks().forEach(t => t.stop());
   cam.stream = null; cancelAnimationFrame(raf);
   $('vp').classList.remove('live', 'mirror'); $('camBtn').textContent = 'Start camera'; $('flipBtn').classList.add('hidden');
-  $('cursor').style.display = 'none'; clearCanvas(); S.gestures = false; log('Camera stopped'); render();
+  $('cursor').style.display = 'none'; clearCanvas(); S.gestures = false;
+  WH.on = false; $('whatBox').classList.add('hidden'); $('whatBtn').classList.remove('on'); $('whatBtn').setAttribute('aria-pressed', 'false'); clearWhat();
+  log('Camera stopped'); render();
 }
 async function loadRecognizer(){
   recState = 'loading'; hud();
@@ -1002,11 +1037,12 @@ function loop(){
     lastVT = v.currentTime;
     let r = null; try { r = rec.recognizeForVideo(v, t); } catch (e) {}
     const hands = (r && r.landmarks) || [], g = r && r.gestures && r.gestures[0] && r.gestures[0][0];
-    if (hands.length >= 2) handleTwo(hands[0], hands[1], t);
-    else handleHand(hands[0] ? (g && g.score >= .6 ? g.categoryName : 'None') : null, hands[0], t);
+    if (hands.length >= 2) { if (!t3Two(hands[0], hands[1])) handleTwo(hands[0], hands[1], t); }
+    else if (!t3Hand(hands[0], t)) handleHand(hands[0] ? (g && g.score >= .6 ? g.categoryName : 'None') : null, hands[0], t);
     drawHands(hands);
   }
   if (needScan() && t - lastScan > 450) { lastScan = t; scanFrame(); }
+  if (WH.on && WH.state === 'ready' && !WH.busy && v.readyState >= 2 && t - WH.last > 350) whatFrame(t);
   raf = requestAnimationFrame(loop);
 }
 
@@ -1041,11 +1077,11 @@ function handleHand(label, lm, t){
   const pts = lm.map(toLocal), W = $('vp').clientWidth;
   const L = isOK(lm) ? 'OK' : isPointing(lm) ? 'Point' : label;
   G.hist.push({t, x:pts[0].x}); while (G.hist.length && t - G.hist[0].t > 500) G.hist.shift();
-  if (S.gestures && t > G.cool && L !== 'Point' && G.hist.length > 3) {
+  if (S.gestures && t > G.cool && L !== 'Point' && G.hist.length > 3 && !T3.on) {
     const dx = pts[0].x - G.hist[0].x;
     if (Math.abs(dx) > W * .28) { G.cool = t + 900; G.hist = []; G.cand = null; step(dx > 0 ? 1 : -1); log(`Swipe ${dx > 0 ? 'right' : 'left'}: bolt ${S.active}`); render(); return; }
   }
-  if (S.gestures && L === 'Point') {
+  if (S.gestures && L === 'Point' && !T3.on) {
     const tip = pts[8], b = boltAt(tip.x, tip.y);
     cur.style.display = 'block'; cur.style.left = tip.x + 'px'; cur.style.top = tip.y + 'px';
     if (b !== G.dwellB) { G.dwellB = b; G.dwellT = t; }
@@ -1053,7 +1089,7 @@ function handleHand(label, lm, t){
     cur.style.setProperty('--p', p);
     if (b && b !== S.active && p >= 1) select(b, 'gesture');
   } else { cur.style.display = 'none'; G.dwellB = null; }
-  if (!(L in HOLD) || (!S.gestures && L !== 'Open_Palm')) { G.cand = null; hud(L); return; }
+  if (!(L in HOLD) || (!S.gestures && L !== 'Open_Palm') || (T3.on && L !== 'Open_Palm')) { G.cand = null; hud(L); return; }
   if (G.cand !== L) { G.cand = L; G.t0 = t; G.p0 = pts[0]; G.fired = false; }
   if (L === 'Open_Palm' && Math.hypot(pts[0].x - G.p0.x, pts[0].y - G.p0.y) > W * .06) { G.t0 = t; G.p0 = pts[0]; }
   const prog = Math.min(1, (t - G.t0) / HOLD[L]);
@@ -1080,9 +1116,307 @@ function drawHands(hands){
   });
 }
 
+// ===== v4: 3D digital twin you can orbit or place in AR (three.js + WebXR) =====
+const THREE_URL = 'https://cdn.jsdelivr.net/npm/three@0.186.1/build/three.module.js';
+const T3 = {on:false, X:null, r:null, scene:null, cam:null, pivot:null, model:null, reticle:null, ray:null, bolts:[], pick:[], yaw:-.42, pitch:.22, dist:2.1, sel:null,
+  xr:null, ref:null, hit:null, placed:false, ptrs:new Map(), pinch0:null, pinch:null, zoomG:null, hintT:0, failed:''};
+const T3COL = {open:0xa9b2b7, ok:0x2db574, bad:0xe23b31, rej:0xe23b31, seq:0xef8d24, sus:0x9b6bff};
+const RAD = 2.4, SKIN_W = 1.9, SKIN_H = 1.3;               // fuselage section: radius 2.4 m, 1.9 m wide, 1.3 m tall
+const clampP = p => Math.max(-1.2, Math.min(1.2, p));
+// Panel drawing units are millimetres (1000 x 700); bolts sit on the curved skin.
+function skinPt(x, y, off){ const th = (x - 500) / 1000 / RAD, r = RAD + (off || 0); return {p:[r * Math.sin(th), (350 - y) / 1000, r * Math.cos(th) - RAD], n:[Math.sin(th), 0, Math.cos(th)]}; }
+function arcPt(s, h, off){ const th = s / RAD, r = RAD + (off || 0); return [r * Math.sin(th), h, r * Math.cos(th) - RAD]; }
+function labelTex(X, text, w, h, bg, fg, font){
+  const c = document.createElement('canvas'); c.width = w; c.height = h; const g = c.getContext('2d');
+  if (bg) { g.fillStyle = bg; g.beginPath(); g.roundRect(2, 2, w - 4, h - 4, h * .28); g.fill(); }
+  g.fillStyle = fg; g.font = font; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(text, w / 2, h / 2 + 2);
+  const t = new X.CanvasTexture(c); t.colorSpace = X.SRGBColorSpace; return t;
+}
+async function init3D(){
+  try { T3.X = await import(THREE_URL); }
+  catch (e) { T3.failed = FRAMED ? 'The 3D library is blocked in this preview. Open the GitHub Pages link on your tablet.' : 'The 3D library could not load. It needs an internet connection the first time.'; return false; }
+  const X = T3.X;
+  try { T3.r = new X.WebGLRenderer({canvas:$('t3dCanvas'), antialias:true, alpha:true}); }
+  catch (e) { T3.failed = 'This device cannot show 3D (WebGL is turned off or not supported).'; return false; }
+  T3.r.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2)); T3.r.setClearColor(0x000000, 0);
+  const sc = T3.scene = new X.Scene();
+  T3.cam = new X.PerspectiveCamera(38, 1, .01, 50);
+  sc.add(new X.HemisphereLight(0xffffff, 0x3d4a55, 1.25));
+  const sun = new X.DirectionalLight(0xffffff, 1.7); sun.position.set(1.6, 2.2, 2.8); sc.add(sun);
+  T3.pivot = new X.Group(); T3.model = new X.Group(); T3.pivot.add(T3.model); sc.add(T3.pivot);
+  const M = T3.model;
+  // Fuselage skin, access panel plate and its outline
+  const skin = new X.Mesh(new X.CylinderGeometry(RAD, RAD, SKIN_H, 72, 1, true, -SKIN_W / 2 / RAD, SKIN_W / RAD), new X.MeshStandardMaterial({color:0xc6ccd0, metalness:.35, roughness:.5, side:X.DoubleSide}));
+  skin.position.z = -RAD; M.add(skin);
+  const pg = new X.CylinderGeometry(RAD + .003, RAD + .003, .4, 40, 1, true, -.28 / RAD, .56 / RAD);
+  const plate = new X.Mesh(pg, new X.MeshStandardMaterial({color:0xaeb6bb, metalness:.4, roughness:.45, side:X.DoubleSide}));
+  plate.position.z = -RAD; M.add(plate);
+  const edge = new X.LineSegments(new X.EdgesGeometry(pg), new X.LineBasicMaterial({color:0x3b4348})); edge.position.z = -RAD; M.add(edge);
+  // Rivet rows along frames and stringers
+  const rv = []; for (let h = -.62; h <= .62; h += .032) { rv.push(arcPt(-.42, h, .002), arcPt(.42, h, .002)); }
+  for (let s = -.92; s <= .92; s += .032) { if (Math.abs(s) < .4) continue; rv.push(arcPt(s, .3, .002), arcPt(s, -.3, .002)); }
+  const rivets = new X.InstancedMesh(new X.SphereGeometry(.0042, 8, 6), new X.MeshStandardMaterial({color:0x8d969b, metalness:.5, roughness:.4}), rv.length);
+  const mt = new X.Matrix4(); rv.forEach((p, i) => { mt.makeTranslation(p[0], p[1], p[2]); rivets.setMatrixAt(i, mt); }); M.add(rivets);
+  // Panel label
+  const lp = skinPt(500, 330, .006);
+  const lbl = new X.Mesh(new X.PlaneGeometry(.17, .055), new X.MeshBasicMaterial({map:labelTex(X, '571AB', 340, 110, null, '#5d666b', '700 78px system-ui, sans-serif'), transparent:true}));
+  lbl.position.set(...lp.p); M.add(lbl);
+  // Bolts: hex head, status ring, repeat-problem ring, number tag, an invisible larger target for tapping
+  const up = new X.Vector3(0, 1, 0);
+  T3.bolts = POS.map(([x, y], i) => {
+    const {p, n} = skinPt(x, y, .004), g = new X.Group(); g.position.set(...p); g.quaternion.setFromUnitVectors(up, new X.Vector3(...n));
+    const head = new X.Mesh(new X.CylinderGeometry(.015, .015, .009, 6), new X.MeshStandardMaterial({color:0x7d878d, metalness:.7, roughness:.3}));
+    const ringM = new X.MeshStandardMaterial({color:T3COL.open, emissive:0x000000, roughness:.4});
+    const ring = new X.Mesh(new X.TorusGeometry(.029, .0055, 10, 40), ringM); ring.rotation.x = Math.PI / 2; ring.position.y = .002;
+    const rec = new X.Mesh(new X.TorusGeometry(.043, .003, 8, 48), new X.MeshBasicMaterial({color:0x9b6bff})); rec.rotation.x = Math.PI / 2; rec.visible = false;
+    const tag = new X.Sprite(new X.SpriteMaterial({map:labelTex(X, String(i + 1), 96, 72, '#1c2328', '#ffffff', '700 46px system-ui, sans-serif'), depthTest:false}));
+    tag.scale.set(.04, .03, 1); tag.position.set(0, .03, -.04); tag.renderOrder = 2;
+    const hitM = new X.Mesh(new X.SphereGeometry(.05, 10, 8), new X.MeshBasicMaterial({transparent:true, opacity:0, depthWrite:false}));
+    hitM.userData = {n:i + 1}; head.userData = {n:i + 1}; ring.userData = {n:i + 1};
+    g.add(head, ring, rec, tag, hitM); M.add(g); T3.pick.push(hitM);
+    return {n:i + 1, g, head, ring, ringM, rec};
+  });
+  // Hazard markers from the task card
+  TASK.hazards.forEach((h, i) => {
+    const {p, n} = skinPt(h.x, h.y, .02), m = new X.Mesh(new X.ConeGeometry(.018, .032, 3), new X.MeshStandardMaterial({color:0xf5c400, emissive:0x3a2c00}));
+    m.position.set(...p); m.quaternion.setFromUnitVectors(up, new X.Vector3(...n)); m.userData = {haz:i}; M.add(m); T3.pick.push(m);
+  });
+  // AR placement reticle
+  T3.reticle = new X.Mesh(new X.RingGeometry(.07, .09, 40).rotateX(-Math.PI / 2), new X.MeshBasicMaterial({color:0xc4d33b}));
+  T3.reticle.matrixAutoUpdate = false; T3.reticle.visible = false; sc.add(T3.reticle);
+  T3.ray = new X.Raycaster();
+  const cv = $('t3dCanvas');
+  cv.addEventListener('pointerdown', e => { cv.setPointerCapture(e.pointerId); T3.ptrs.set(e.pointerId, {x:e.clientX, y:e.clientY, x0:e.clientX, y0:e.clientY, t0:performance.now()}); T3.pinch0 = null; });
+  cv.addEventListener('pointermove', e => {
+    const q = T3.ptrs.get(e.pointerId); if (!q) return;
+    if (T3.ptrs.size === 1) { T3.yaw -= (e.clientX - q.x) * .006; T3.pitch = clampP(T3.pitch + (e.clientY - q.y) * .006); }
+    q.x = e.clientX; q.y = e.clientY;
+    if (T3.ptrs.size === 2) { const [a, b] = [...T3.ptrs.values()], d = Math.hypot(a.x - b.x, a.y - b.y); if (!T3.pinch0) T3.pinch0 = {d, dist:T3.dist}; T3.dist = Math.max(.6, Math.min(5, T3.pinch0.dist * T3.pinch0.d / Math.max(d, 10))); }
+  });
+  const up3 = e => { const q = T3.ptrs.get(e.pointerId); T3.ptrs.delete(e.pointerId); if (q && T3.ptrs.size === 0 && Math.hypot(e.clientX - q.x0, e.clientY - q.y0) < 8 && performance.now() - q.t0 < 500) tap3D(e.clientX, e.clientY); };
+  cv.addEventListener('pointerup', up3); cv.addEventListener('pointercancel', e => T3.ptrs.delete(e.pointerId));
+  cv.addEventListener('wheel', e => { e.preventDefault(); T3.dist = Math.max(.6, Math.min(5, T3.dist * (1 + e.deltaY * .001))); }, {passive:false});
+  new ResizeObserver(resize3D).observe($('t3d'));
+  return true;
+}
+function resize3D(){
+  if (!T3.r || T3.xr) return;
+  const el = $('t3d'), w = el.clientWidth, h = el.clientHeight; if (!w || !h) return;
+  T3.r.setSize(w, h, false); T3.cam.aspect = w / h; T3.cam.updateProjectionMatrix();
+}
+function tick3D(time, frame){
+  const rec = recurring(), pulse = 1 + .12 * Math.sin((time || 0) / 260);
+  const sig = S.bolts.map(b => b.status).join() + S.active; if (sig !== T3.sig) { T3.sig = sig; if (!T3.xr && T3.on) info3D(T3.sel); }
+  T3.bolts.forEach(b => {
+    const s = S.bolts[b.n - 1], st = s.status, col = st === 'open' && b.n === S.active ? 0x4aa3ff : (T3COL[st] || T3COL.open);
+    b.ringM.color.setHex(col); b.ringM.emissive.setHex(b.n === T3.sel ? 0x333333 : 0x000000);
+    b.rec.visible = rec.includes(b.n); b.rec.scale.setScalar(pulse);
+    b.head.scale.setScalar(b.n === T3.sel ? 1.35 : 1);
+  });
+  if (T3.xr) {
+    if (frame && T3.hit && !T3.placed) {
+      const res = frame.getHitTestResults(T3.hit);
+      if (res.length) { const pose = res[0].getPose(T3.ref); if (pose) { T3.reticle.visible = true; T3.reticle.matrix.fromArray(pose.transform.matrix); } } else T3.reticle.visible = false;
+    }
+  } else {
+    const c = Math.cos(T3.pitch), d = T3.dist * Math.max(1, 1.15 / (T3.cam.aspect || 1));   // step back on narrow screens
+    T3.cam.position.set(d * c * Math.sin(T3.yaw), -.05 + d * Math.sin(T3.pitch), -.03 + d * c * Math.cos(T3.yaw));
+    T3.cam.lookAt(0, -.05, -.03);
+  }
+  T3.r.render(T3.scene, T3.cam);
+}
+function tap3D(cx, cy){
+  const r = $('t3dCanvas').getBoundingClientRect(), X = T3.X;
+  T3.ray.setFromCamera(new X.Vector2((cx - r.left) / r.width * 2 - 1, -((cy - r.top) / r.height) * 2 + 1), T3.cam);
+  pick3D(T3.ray.intersectObjects(T3.pick, false));
+}
+function pick3D(hits){
+  const u = hits.length ? hits[0].object.userData : null;
+  if (u && u.n) { T3.sel = u.n; info3D(u.n); log(`3D twin: bolt ${u.n} inspected`); }
+  else if (u && u.haz != null) { const h = TASK.hazards[u.haz]; T3.sel = null; setInfo3D(`<h3>Hazard: ${esc(h.title)}</h3><p>${esc(h.text)}</p>`); }
+  else { T3.sel = null; info3D(null); }
+}
+function boltLine(s){
+  const run = s.run != null ? ` (running ${f1(s.run)})` : '';
+  return {open:'Not torqued yet today', ok:`In spec today: ${f1(s.reading)} ${U}${run}`, bad:`Out of tolerance today: ${s.reading != null ? f1(s.reading) + ' ' + U : ''}`, seq:'Torqued out of sequence; redo in order',
+    sus:'Suspect: torqued with a wrench that later failed its check', rej:'Rejected by the inspector; rework needed'}[s.status] || s.status;
+}
+function info3D(n){
+  if (!n) {
+    const ok = S.bolts.filter(b => b.status === 'ok').length, rec = recurring();
+    setInfo3D(`<h3>Panel 571AB · ${esc(TASK.ac)}</h3><p>${ok}/12 bolts in spec today.${rec.length ? ` Purple ring: repeat problem on bolt${rec.length > 1 ? 's' : ''} ${listNums(rec)}.` : ''}</p><p class="mut">Tap a bolt for its readings from every visit. Yellow markers are hazards.</p>`);
+    return;
+  }
+  const s = S.bolts[n - 1], rec = recurring().includes(n);
+  const when = s.t ? ` · ${new Date(s.t).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}` : '';
+  setInfo3D(`<h3>Bolt ${n}</h3><p>${esc(boltLine(s))}${s.tool ? ` · ${esc(s.tool)}` : ''}${when}</p>
+    <ul>${TWIN.map(v => `<li>${fmtDate(v.date)}: ${f1(v.r[n - 1])} ${U}${v.issues[n] ? ` · ${esc(v.issues[n])}` : ''}</li>`).join('')}</ul>
+    ${rec ? '<p class="warn3">Repeat problem: check the anchor nut and thread condition.</p>' : ''}
+    <button class="btn" data-go="${n}">Make bolt ${n} the current bolt</button>`);
+}
+function setInfo3D(html){
+  const box = T3.xr ? $('xrInfo') : $('t3dInfo'); box.innerHTML = html; box.classList.remove('hidden');
+  box.querySelectorAll('[data-go]').forEach(b => { b.addEventListener('beforexrselect', e => e.preventDefault()); b.onclick = () => { select(+b.dataset.go, '3D twin'); toast(`Bolt ${b.dataset.go} is now the current bolt`); info3D(+b.dataset.go); render(); }; });
+}
+function hint3D(text, ms){
+  const el = $('t3dHint'); el.textContent = text; clearTimeout(T3.hintT);
+  T3.hintT = setTimeout(() => el.textContent = 'Drag to turn · pinch to zoom · tap a bolt. Gestures on: pinch your fingers and move to turn; two hands apart to zoom.', ms || 2500);
+}
+async function open3D(){
+  if (T3.on) { close3D(); return; }
+  T3.on = true; $('t3d').classList.remove('hidden'); $('vp').classList.add('t3on'); $('twin3dBtn').classList.add('on'); $('twin3dBtn').setAttribute('aria-pressed', 'true');
+  log('3D twin opened');
+  if (!T3.r) { setInfo3D('<h3>Loading the 3D twin…</h3>'); if (!await init3D()) { setInfo3D(`<h3>3D twin not available</h3><p>${esc(T3.failed)}</p>`); return; } }
+  if (!T3.on) return;
+  resize3D(); info3D(T3.sel); hint3D('', 1); T3.r.setAnimationLoop(tick3D);
+}
+function close3D(){
+  if (T3.xr) { try { T3.xr.end(); } catch (e) {} }
+  T3.on = false; T3.pinch = null; T3.zoomG = null;
+  $('t3d').classList.add('hidden'); $('vp').classList.remove('t3on'); $('twin3dBtn').classList.remove('on'); $('twin3dBtn').setAttribute('aria-pressed', 'false');
+  if (T3.r) T3.r.setAnimationLoop(null); log('3D twin closed'); render();
+}
+// Hand gestures while the 3D twin is open: pinch and move to turn it, two hands apart or together to zoom.
+function t3Hand(lm, t){
+  T3.zoomG = null;
+  if (!T3.on || T3.xr || !S.gestures || !lm) { T3.pinch = null; return false; }
+  if (dist(lm, 4, 8) >= dist(lm, 0, 9) * .3) { T3.pinch = null; return false; }
+  const p = toLocal({x:(lm[4].x + lm[8].x) / 2, y:(lm[4].y + lm[8].y) / 2}), W = $('vp').clientWidth || 1;
+  if (T3.pinch) { T3.yaw -= (p.x - T3.pinch.x) / W * 5; T3.pitch = clampP(T3.pitch + (p.y - T3.pinch.y) / W * 5); }
+  T3.pinch = p; $('cursor').style.display = 'none'; hint3D('Pinch: turning the twin', 900); return true;
+}
+function t3Two(a, b){
+  if (!T3.on || T3.xr || !S.gestures) return false;
+  T3.pinch = null; const d = Math.max(.05, Math.hypot(a[0].x - b[0].x, a[0].y - b[0].y));
+  if (!T3.zoomG) T3.zoomG = {d, dist:T3.dist};
+  T3.dist = Math.max(.6, Math.min(5, T3.zoomG.dist * T3.zoomG.d / d)); hint3D('Two hands: apart to zoom in, together to zoom out', 900); return true;
+}
+// Place the twin on a table or the floor with WebXR (Chrome on ARCore Android devices)
+async function startXR(){
+  if (!T3.r) return;
+  let ok = false; try { ok = !!navigator.xr && await navigator.xr.isSessionSupported('immersive-ar'); } catch (e) {}
+  if (!ok) { hint3D('Placing the twin in the room needs Chrome on an Android tablet that supports ARCore. The 3D view works here.', 7000); log('AR placement not supported on this device'); return; }
+  let s;
+  try { s = await navigator.xr.requestSession('immersive-ar', {requiredFeatures:['hit-test'], optionalFeatures:['dom-overlay'], domOverlay:{root:$('xro')}}); }
+  catch (e) { hint3D(`AR could not start (${e.name || 'error'}).`, 6000); return; }
+  const X = T3.X; T3.xr = s; T3.placed = false; $('xro').classList.add('on'); $('xrInfo').classList.add('hidden');
+  $('xrMsg').textContent = 'Move the tablet slowly over a table or the floor, then tap to place the twin.';
+  T3.r.xr.enabled = true; T3.r.xr.setReferenceSpaceType('local'); await T3.r.xr.setSession(s);
+  T3.ref = T3.r.xr.getReferenceSpace();
+  try { T3.hit = await s.requestHitTestSource({space:await s.requestReferenceSpace('viewer')}); } catch (e) { T3.hit = null; }
+  T3.pivot.visible = false; T3.pivot.scale.setScalar(.5); T3.model.position.set(0, SKIN_H / 2, 0);
+  s.addEventListener('select', e => {
+    if (!T3.placed) {
+      if (!T3.reticle.visible) return;
+      T3.pivot.position.setFromMatrixPosition(T3.reticle.matrix);
+      const cp = new X.Vector3().setFromMatrixPosition(T3.r.xr.getCamera().matrixWorld);
+      T3.pivot.rotation.set(0, Math.atan2(cp.x - T3.pivot.position.x, cp.z - T3.pivot.position.z), 0);
+      T3.pivot.visible = true; T3.placed = true; T3.reticle.visible = false;
+      $('xrMsg').textContent = 'Placed. Walk around it, or tap a bolt to see its history.'; log('3D twin placed in AR'); return;
+    }
+    const pose = e.frame && e.frame.getPose(e.inputSource.targetRaySpace, T3.ref); if (!pose) return;
+    const o = pose.transform.position, q = pose.transform.orientation;
+    T3.ray.set(new X.Vector3(o.x, o.y, o.z), new X.Vector3(0, 0, -1).applyQuaternion(new X.Quaternion(q.x, q.y, q.z, q.w)));
+    pick3D(T3.ray.intersectObjects(T3.pick, false));
+  });
+  s.addEventListener('end', () => {
+    T3.xr = null; T3.hit = null; T3.placed = false; $('xro').classList.remove('on');
+    T3.r.xr.enabled = false; T3.pivot.position.set(0, 0, 0); T3.pivot.rotation.set(0, 0, 0); T3.pivot.scale.setScalar(1); T3.pivot.visible = true; T3.model.position.set(0, 0, 0); T3.reticle.visible = false;
+    resize3D(); if (T3.on) { T3.r.setAnimationLoop(tick3D); info3D(T3.sel); } log('AR placement ended');
+  });
+  log('AR placement started');
+}
+
+// ===== v4: "What's this?" component recognition =====
+const TF_URL = 'https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.22.0/dist/tf.min.js';
+const OD_MODEL = 'https://storage.googleapis.com/mediapipe-models/object_detector/efficientdet_lite0/float16/1/efficientdet_lite0.tflite';
+const CM = 'models/components/';           // drop a Teachable Machine image model export here (model.json, weights.bin, metadata.json)
+const WH = {on:false, state:'idle', mode:null, model:null, labels:[], size:224, det:null, busy:false, last:0, crop:null, recent:[]};
+const PARTS = [
+  {k:['panel', 'door', 'cover'], name:'Access panel', text:'Removable panel that gives access to the systems behind the skin.', id:true},
+  {k:['wheel', 'tyre', 'tire'], name:'Wheel and tyre', text:'Wheel and tyre assembly. Typical tasks: tyre pressure check and wheel change; the axle nut torque and locking are critical steps.'},
+  {k:['pitot'], name:'Pitot probe', text:'Senses ram air pressure for the airspeed indication. Do not touch it while probe heat is on; fit the cover when the aircraft is parked.'},
+  {k:['static'], name:'Static port', text:'Senses outside air pressure for the altimeter and airspeed. Keep it clean and undamaged; do not polish, wax or paint over it.'},
+  {k:['antenna', 'aerial'], name:'Antenna', text:'Radio or navigation antenna. Check for damage, cracked sealant and a secure mounting.'},
+  {k:['airplane', 'aircraft', 'aeroplane'], name:'Aircraft', text:'Aircraft in view. Point at a panel or part; telling parts apart needs the trained parts model.'}
+];
+function loadScript(src){ return new Promise((ok, no) => { if (document.querySelector(`script[src="${src}"]`) && window.tf) return ok(); const s = document.createElement('script'); s.src = src; s.onload = ok; s.onerror = no; document.head.appendChild(s); }); }
+function whatShow(html){ const b = $('whatBox'); b.innerHTML = html; b.classList.remove('hidden'); }
+function clearWhat(){ const c = $('cvW'); c.getContext('2d').clearRect(0, 0, c.width, c.height); }
+async function toggleWhat(){
+  if (WH.on) { WH.on = false; $('whatBox').classList.add('hidden'); clearWhat(); $('whatBtn').classList.remove('on'); $('whatBtn').setAttribute('aria-pressed', 'false'); log("What's this? off"); return; }
+  WH.on = true; $('whatBtn').classList.add('on'); $('whatBtn').setAttribute('aria-pressed', 'true'); WH.recent = [];
+  if (!cam.stream) await startCamera();
+  if (!cam.stream) { WH.on = false; $('whatBtn').classList.remove('on'); $('whatBtn').setAttribute('aria-pressed', 'false'); return; }
+  whatShow('<b>Loading the recogniser…</b>');
+  if (WH.state === 'idle' || WH.state === 'failed') await loadWhat();
+  if (WH.state === 'ready') whatShow(`<b>Point the camera at a component</b><span>${WH.mode === 'custom' ? `Parts model: ${WH.labels.map(esc).join(', ')}.` : 'Demo model: knows aircraft and everyday objects. Add your trained parts model to recognise panels, wheels and probes.'}</span>`);
+  log(`What's this? on (${WH.mode === 'custom' ? 'parts model' : WH.mode === 'demo' ? 'demo model' : 'not available'})`); render();
+}
+async function loadWhat(){
+  WH.state = 'loading';
+  try {
+    const r = await fetch(CM + 'metadata.json', {cache:'no-store'});
+    if (r.ok) {
+      const meta = await r.json(); await loadScript(TF_URL);
+      WH.model = await window.tf.loadLayersModel(CM + 'model.json'); WH.labels = meta.labels || []; WH.size = meta.imageSize || 224; WH.mode = 'custom'; WH.state = 'ready'; return;
+    }
+  } catch (e) { /* no parts model: use the demo model */ }
+  try {
+    const {FilesetResolver, ObjectDetector} = await import(MP + '/vision_bundle.mjs');
+    const files = await FilesetResolver.forVisionTasks(MP + '/wasm');
+    const o = d => ({baseOptions:{modelAssetPath:OD_MODEL, delegate:d}, runningMode:'VIDEO', scoreThreshold:.4, maxResults:3});
+    try { WH.det = await ObjectDetector.createFromOptions(files, o('GPU')); } catch (e) { WH.det = await ObjectDetector.createFromOptions(files, o('CPU')); }
+    WH.mode = 'demo'; WH.state = 'ready';
+  } catch (e) { WH.mode = null; WH.state = 'failed'; whatShow('<b>The recogniser could not load.</b><span>It needs an internet connection the first time.</span>'); }
+}
+async function whatFrame(t){
+  WH.busy = true; WH.last = t; const v = $('video');
+  try {
+    if (WH.mode === 'custom') {
+      const n = WH.size, tf = window.tf; if (!WH.crop) { WH.crop = document.createElement('canvas'); WH.crop.width = WH.crop.height = n; }
+      const s = Math.min(v.videoWidth, v.videoHeight); WH.crop.getContext('2d').drawImage(v, (v.videoWidth - s) / 2, (v.videoHeight - s) / 2, s, s, 0, 0, n, n);
+      const out = tf.tidy(() => WH.model.predict(tf.browser.fromPixels(WH.crop).toFloat().div(127).sub(1).expandDims(0)));
+      const d = await out.data(); out.dispose();
+      let bi = 0; d.forEach((x, i) => { if (x > d[bi]) bi = i; });
+      showPart(WH.labels[bi] || `class ${bi + 1}`, d[bi], false);
+    } else if (WH.mode === 'demo' && WH.det) {
+      const r = WH.det.detectForVideo(v, t), ds = (r && r.detections) || []; drawWhat(ds);
+      const top = ds[0] && ds[0].categories && ds[0].categories[0];
+      showPart(top ? top.categoryName : null, top ? top.score : 0, true);
+    }
+  } catch (e) {}
+  WH.busy = false;
+}
+function showPart(label, score, demo){
+  WH.recent.push(label); if (WH.recent.length > 3) WH.recent.shift();
+  if (WH.recent.filter(x => x === label).length < 2) return;            // wait for 2 of the last 3 frames to agree
+  const lo = (label || '').toLowerCase(), part = PARTS.find(p => p.k.some(k => lo.includes(k)));
+  if (!label || /background|nothing|none|other/.test(lo) || score < (demo ? .4 : .6)) { whatShow(`<b>Point the camera at a component</b><span>${demo ? 'Demo model: knows aircraft and everyday objects. Add your trained parts model to recognise panels, wheels and probes.' : 'Hold steady about a metre away.'}</span>`); return; }
+  if (part) whatShow(`<b>${part.name} · ${Math.round(score * 100)}%</b><span>${part.text}</span>${part.id ? '<span class="sm">Type recognised. Panels look alike: scan its QR code or read the stencilled number to confirm which panel.</span>' : ''}`);
+  else whatShow(`<b>${esc(label)} · ${Math.round(score * 100)}%</b><span>${demo ? 'Not an aircraft part. The demo model only knows everyday objects.' : 'No notes for this part yet.'}</span>`);
+}
+function drawWhat(ds){
+  const c = $('cvW'), vp = $('vp'), v = $('video'), dpr = window.devicePixelRatio || 1, W = vp.clientWidth, H = vp.clientHeight;
+  if (c.width !== Math.round(W * dpr) || c.height !== Math.round(H * dpr)) { c.width = Math.round(W * dpr); c.height = Math.round(H * dpr); }
+  const g = c.getContext('2d'); g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, W, H);
+  const vw = v.videoWidth || 1, vh = v.videoHeight || 1;
+  ds.forEach(d => {
+    const b = d.boundingBox, cat = d.categories && d.categories[0]; if (!b || !cat) return;
+    const p = toLocal({x:b.originX / vw, y:b.originY / vh}), q = toLocal({x:(b.originX + b.width) / vw, y:(b.originY + b.height) / vh});
+    const x = Math.min(p.x, q.x), y = Math.min(p.y, q.y), w = Math.abs(q.x - p.x), h = Math.abs(q.y - p.y);
+    g.lineWidth = 3; g.strokeStyle = '#c4d33b'; g.strokeRect(x, y, w, h);
+    const tx = `${cat.categoryName} ${Math.round(cat.score * 100)}%`; g.font = '600 14px system-ui, sans-serif';
+    g.fillStyle = '#c4d33b'; g.fillRect(x, Math.max(0, y - 22), g.measureText(tx).width + 12, 22); g.fillStyle = '#1c2108'; g.fillText(tx, x + 6, Math.max(15, y - 6));
+  });
+}
+
 $('camBtn').onclick = () => cam.stream ? stopCamera() : startCamera();
 $('flipBtn').onclick = () => { cam.facing = cam.facing === 'user' ? 'environment' : 'user'; if (cam.stream) { cam.stream.getTracks().forEach(t => t.stop()); cam.stream = null; } startCamera(); };
 $('twinBtn').onclick = toggleTwin;
+$('twin3dBtn').onclick = open3D; $('t3dClose').onclick = close3D; $('xrBtn').onclick = startXR;
+$('xrExit').addEventListener('beforexrselect', e => e.preventDefault()); $('xrExit').onclick = () => { if (T3.xr) T3.xr.end(); };
+$('whatBtn').onclick = toggleWhat;
 document.querySelectorAll('[data-wbgt]').forEach(b => b.onclick = () => { const was = heat(S.wbgt).lv; S.wbgt = +b.dataset.wbgt; const h = heat(S.wbgt); log(`Heat sensor: WBGT ${f1(S.wbgt)} °C (${h.band.toLowerCase()})`); if (h.lv > was && h.lv) toast(`Heat stress: ${h.text}`, h.lv >= 2 ? 'bad' : 'warn'); render(); });
 $('photoBtn').onclick = takePhoto;
 $('csvDl').onclick = () => { try { const url = URL.createObjectURL(new Blob([csv()], {type:'text/csv'})); const a = document.createElement('a'); a.href = url; a.download = `torquetrace-${WO.no}.csv`; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 2000); log('Data log downloaded as CSV'); render(); } catch (e) { toast('Download not available here'); } };
@@ -1096,7 +1430,7 @@ document.addEventListener('keydown', e => {
   if (k === 't' || k === ' ') { e.preventDefault(); if (S.toolState === 'connected') simPull(); else toast('Connect a wrench first', 'warn'); }
   else if (k === 'n') step(1); else if (k === 'b') step(-1);
   else if (k === 'g') { S.gestures = !S.gestures; log(`Gestures turned ${S.gestures ? 'on' : 'off'} (keyboard)`); render(); }
-  else if (k === 'p') takePhoto(); else if (k === 'm') toggleManual(); else if (k === 'f') finish('keyboard'); else if (k === 'o') confirmBolt(S.active, 'keyboard');
+  else if (k === 'p') takePhoto(); else if (k === 'm') toggleManual(); else if (k === '3') open3D(); else if (k === 'w') toggleWhat(); else if (k === 'f') finish('keyboard'); else if (k === 'o') confirmBolt(S.active, 'keyboard');
 });
 const setTop = () => document.documentElement.style.setProperty('--toph', $('top').offsetHeight + 'px');
 const topObs = new ResizeObserver(setTop); topObs.observe($('top'));
@@ -1106,7 +1440,9 @@ const teleTimer = setInterval(() => { if (S.toolState === 'connected' && S.mode 
 buildOverlay(); setTop();
 if (!S.log.length) log('Task opened: refit access panel 571AB');
 render();
-window.__tt = {S:() => S, toggleManual, handleCode, onTorque, handleHand, handleTwo, fire, finish, handover, analyzeStripe, confirmBolt, csv, fast:v => { FAST = v; }, teleTimer};
+window.__tt = {t3:{state:() => ({on:T3.on, ready:!!T3.r, failed:T3.failed, yaw:T3.yaw, pitch:T3.pitch, dist:T3.dist, sel:T3.sel}),
+  screen:n => { const v = new T3.X.Vector3(); T3.bolts[n - 1].head.getWorldPosition(v); v.project(T3.cam); const r = $('t3dCanvas').getBoundingClientRect(); return {x:r.left + (v.x + 1) / 2 * r.width, y:r.top + (1 - v.y) / 2 * r.height}; }},
+  t3Hand, t3Two, what:() => ({on:WH.on, state:WH.state, mode:WH.mode, labels:WH.labels}), S:() => S, toggleManual, handleCode, onTorque, handleHand, handleTwo, fire, finish, handover, analyzeStripe, confirmBolt, csv, fast:v => { FAST = v; }, teleTimer};
 }
 </script>
 </body>
