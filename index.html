@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>TorqueTrace prototype</title>
+<title>ToolTrace prototype</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Semi+Condensed:wght@500;600;700&display=swap" rel="stylesheet">
@@ -165,7 +165,7 @@ details summary{cursor:pointer;font-weight:600;min-height:32px}details p,details
 </head>
 <body>
 <header class="top" id="top">
-  <h1 class="brand">TorqueTrace <small>prototype v4</small></h1>
+  <h1 class="brand">ToolTrace <small>prototype v4</small></h1>
   <div class="task"><b>Refit access panel 571AB</b> · 9V-ZZC · 12 self-locking anchor nuts · 25.0 N·m ± 1.0 plus running torque · critical task (demo)</div>
   <div class="chips" id="chips"></div>
 </header>
@@ -912,7 +912,7 @@ async function loadImage(file){ const url = URL.createObjectURL(file); try { con
 
 function handleCode(text, via){
   const m = /^TT[:\s-]*([A-Z]{2})-?(\d{4})$/i.exec(String(text).trim());
-  if (!m) { if (via !== 'camera') toast('Not a TorqueTrace code', 'warn'); return; }
+  if (!m) { if (via !== 'camera') toast('Not a ToolTrace code', 'warn'); return; }
   const id = (m[1] + '-' + m[2]).toUpperCase(), t = TOOLS[id];
   if (m[1].toUpperCase() === 'LT') { logPart(id, via); return; }
   if (!t) { toast(`${id} is not in the tool register`, 'bad'); log(`Scanned ${id}: not in tool register`); render(); return; }
@@ -1419,7 +1419,7 @@ $('xrExit').addEventListener('beforexrselect', e => e.preventDefault()); $('xrEx
 $('whatBtn').onclick = toggleWhat;
 document.querySelectorAll('[data-wbgt]').forEach(b => b.onclick = () => { const was = heat(S.wbgt).lv; S.wbgt = +b.dataset.wbgt; const h = heat(S.wbgt); log(`Heat sensor: WBGT ${f1(S.wbgt)} °C (${h.band.toLowerCase()})`); if (h.lv > was && h.lv) toast(`Heat stress: ${h.text}`, h.lv >= 2 ? 'bad' : 'warn'); render(); });
 $('photoBtn').onclick = takePhoto;
-$('csvDl').onclick = () => { try { const url = URL.createObjectURL(new Blob([csv()], {type:'text/csv'})); const a = document.createElement('a'); a.href = url; a.download = `torquetrace-${WO.no}.csv`; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 2000); log('Data log downloaded as CSV'); render(); } catch (e) { toast('Download not available here'); } };
+$('csvDl').onclick = () => { try { const url = URL.createObjectURL(new Blob([csv()], {type:'text/csv'})); const a = document.createElement('a'); a.href = url; a.download = `tooltrace-${WO.no}.csv`; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 2000); log('Data log downloaded as CSV'); render(); } catch (e) { toast('Download not available here'); } };
 $('csvCopy').onclick = () => copyText(csv(), 'CSV copied');
 $('hoBtn').onclick = () => { const ta = $('hoText'); S.handed = true; ta.value = handover(); ta.classList.remove('hidden'); $('copyBtn').disabled = false; log('Handover summary generated'); render(); };
 $('copyBtn').onclick = async () => { const ta = $('hoText'); try { await navigator.clipboard.writeText(ta.value); toast('Summary copied', 'ok'); } catch (e) { ta.focus(); ta.select(); toast('Press copy on your keyboard or menu'); } };

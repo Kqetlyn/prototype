@@ -1,4 +1,4 @@
-# TorqueTrace prototype (v4)
+# ToolTrace prototype (v4)
 
 A tablet web app for aircraft MRO that pins every torque reading to the right bolt, checks tools before and after use, error-proofs the job, and hands unfinished work to the next shift. School project concept for SIAEC operations, answering: *How can smart tools (e.g. digital torque wrenches, AR-assisted repair manuals) improve accuracy, efficiency and safety in MRO?*
 
@@ -44,7 +44,7 @@ A tablet web app for aircraft MRO that pins every torque reading to the right bo
 
 ## Test stickers
 
-Print `stickers/torquetrace_test_stickers.png`. Each QR code holds plain text:
+Print `stickers/tooltrace_test_stickers.png`. Each QR code holds plain text:
 
 | Code | Expected result |
 |---|---|
